@@ -1,18 +1,29 @@
 import numpy as np
 import cv2
 
-lo=np.array([80, 50, 50])
-hi=np.array([100, 255, 255])
+blue = 120
+green = 60
+sensitivity = 20
 
-def detect_inrange(image, surface):
+blue_lo=np.array([100, 50, 50])
+blue_hi=np.array([140, 255, 255])
+
+green_lo=np.array([40, 50, 50])
+green_hi=np.array([80, 255, 255])
+
+def detect_inrange(image, surface, color):
     points=[]
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    lo=np.array([color - sensitivity, 50, 50])
+    hi=np.array([color + sensitivity, 255, 255])
+
+    image=cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     image=cv2.blur(image, (5, 5))
     mask=cv2.inRange(image, lo, hi)
     mask=cv2.erode(mask, None, iterations=2)
     mask=cv2.dilate(mask, None, iterations=2)
     elements=cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
     elements=sorted(elements, key=lambda x:cv2.contourArea(x), reverse=True)
+    
     for element in elements:
         if cv2.contourArea(element)>surface:
             ((x, y), rayon)=cv2.minEnclosingCircle(element)
@@ -20,7 +31,7 @@ def detect_inrange(image, surface):
         else:
             break
 
-    return points, mask
+    return elements, mask
 
 def detect_visage(image):
     face_cascade=cv2.CascadeClassifier("./haarcascade_frontalface_alt2.xml")
