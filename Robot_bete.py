@@ -358,7 +358,8 @@ def test_object(prox_threshold=2000,prox_threshold_side=1600, verbose=True):
 # In[83]:
 
 
-async def g_path_FSM(speed, verbose=True):
+
+def g_path_FSM(speed, verbose=True):
       while True:
 
         await go_straight(speed, verbose=verbose)
@@ -378,7 +379,7 @@ w_ri_old = 0
     
 light_em_up()
     
-await g_path_FSM(10, verbose=True)
+g_path_FSM(10, verbose=True)
 
 
 # In[147]:
