@@ -31,7 +31,7 @@ def detect_inrange(image, surface, color):
         else:
             break
 
-    return elements, mask
+    return points, mask
 
 def detect_visage(image):
     face_cascade=cv2.CascadeClassifier("./haarcascade_frontalface_alt2.xml")
