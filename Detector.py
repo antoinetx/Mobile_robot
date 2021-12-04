@@ -31,14 +31,29 @@ def detect_inrange(image, surface, color):
         else:
             break
 
-    return points, mask
+    return points, mask, elements
 
-def detect_visage(image):
-    face_cascade=cv2.CascadeClassifier("./haarcascade_frontalface_alt2.xml")
-    points=[]
-    gray=cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    face=face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=3)
-    for x, y, w, h in face:
-        points.append(np.array([int(x+w/2), int(y+h/2)]))
-
-    return points, None
+def detect_center(image, contours):
+    a=0
+    center_points=[]
+    center_contours=[]
+    
+    for i in contours:
+        M = cv2.moments(i)
+        if M['m00'] != 0:
+            #print('valeur')
+            #print(a)
+            a += 1
+            cx = int(M['m10']/M['m00'])
+            cy = int(M['m01']/M['m00'])
+            
+            center_points.append(np.array([int(cx), int(cy)]))
+            center_contours.append(i)
+            """
+            cv2.drawContours(image, [i], -1, (0, 255, 0), 2)
+            cv2.circle(image, (cx, cy), 7, (0, 0, 255), -1)
+            cv2.putText(image, "center", (cx - 20, cy - 20),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+                    """
+    #print(f"x: {cx} y: {cy}")
+    return center_points, center_contours
