@@ -13,6 +13,7 @@ class Map :
         self._lenght_m = lenght_in_m #lenght of the smallest size
         self._wanted_nb_square_by_side = wanted_nb_square_per_side
         self._grid_init = False
+        self._square_size_m = 0.1
     
 
     def get_map(self):
@@ -82,7 +83,6 @@ class Map :
         self._grid = data_i
         self._grid_init = True
         
-        
     def grid_show(self):
         """
         Plot the _grid
@@ -90,3 +90,29 @@ class Map :
         plt.imshow(self._grid, vmin=0, vmax=1, origin='lower', interpolation='none', alpha=1)
         plt.draw()
         plt.show()
+
+
+    def security_grid_expand(self, frame):
+        """
+        Expand the grid to avoid the robot colyding whit an obstacle
+        :param frame: the video frame 
+        :save in map._grid: save the new expand grid
+        :return: the new expand grid
+        """
+        robot_lenght = 0.10 # 10 cm
+        marge = 0.03 # 3 cm de marge
+        sec_square = math.ceil((robot_lenght/2)/self._square_size_m) + math.ceil(marge/self._square_size_m)
+
+        len_i = len(frame)
+        len_j = len(frame[0])
+
+        new_frame = np.zeros((len_i,len_j))
+
+        for i in range(len_i):
+            if sum(frame[i,:] != 0): # this if allow to avoid the second loop if there is no obstacle on this line
+                for j in range(len_j):
+                    if frame[i,j] == 1:
+                        new_frame[(i-sec_square):(i+sec_square),(j-sec_square):(j+sec_square)] = 0.5
+
+        self._grid = new_frame # Save the new grid in the object
+        return new_frame
