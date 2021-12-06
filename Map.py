@@ -23,7 +23,7 @@ class Map :
             print("No grid yet. Please init the grid")
 
     #def update_map(self, new_grid):
-    #    self.grid = new_grid
+    #    self._grid = new_grid
 
     def get_lenght(self):
         return self._nb_square_by_side
@@ -50,9 +50,10 @@ class Map :
         
         for i in range(len(frame)):
             for j in range(len(frame[0])):
-                r = frame[i,j,0]
+                # order : b,g,r
+                b = frame[i,j,0]
                 g = frame[i,j,1]
-                b = frame[i,j,2]
+                r = frame[i,j,2]
                 
                 if(((r >= r_tresh[0]) & (r <= r_tresh[1])) & ((g >= g_tresh[0]) & (g <= g_tresh[1])) & ((b >= b_tresh[0]) & (b <= b_tresh[1]))):
                     j_pixel_state = 1
