@@ -1,31 +1,22 @@
-import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
+
 import cv2
 import numpy as np
 
-
-"""
-
-all_camera_idx_available = []
-
-for camera_idx in range(10):
-    cap = cv2.VideoCapture(camera_idx)
-    if cap.isOpened():
-        print(f'Camera index available: {camera_idx}')
-        all_camera_idx_available.append(camera_idx)
-        cap.release()
-        
-"""
+       
         
 VideoCap=cv2.VideoCapture(0)
-VideoCap_2 = cv2.videoCapture(1)
-while True:
-    a=a+1
-    check, frame= VideoCap.read()
-    check2, frame2= VideoCap_2.read()
+check, frame= VideoCap.read()
 
-    cv2.imshow('image1', frame)
-    cv2.imshow('image2', frame2)
+print(frame.shape)
+#print(return_camera_indices())
+
+while True:
+    
+    check, frame= VideoCap.read()
+    
+
+    cv2.imshow('image', frame)
+    
 
     if cv2.waitKey(1)&0xFF==ord('q'):
         VideoCap.release()
@@ -33,3 +24,24 @@ while True:
         break
 
 
+
+
+
+
+
+
+    """
+    
+    def return_camera_indices():
+        index = -2
+        arr = []
+        i = 10
+        while i > 0:
+            cap = cv2.VideoCapture(index)
+            if cap.read()[0]:
+                arr.append(index)
+                cap.release()
+            index += 1
+            i -= 1
+        return arr
+    """

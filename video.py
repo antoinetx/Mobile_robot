@@ -4,12 +4,13 @@ from Map import Map
 from Detector import detect_inrange, detect_center
 from KalmanFilter import KalmanFilter
 import sys
+#import v4l2capture
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
 from matplotlib.colors import ListedColormap
-
+#b, g ,r = cv2.split(frame)
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -21,17 +22,22 @@ reduction = 10
 x_max = int(480)
 y_max = int(640)
 
-
-
-
+def put_center_circle(image, contours,points):
+    #put a cicrcle on the center of the object
+    center_points, center_contours = detect_center(frame, contours)
+    if (len(points)>0):
+        for i in points:
+            cv2.circle(frame, (i[0], i[1]), 7, (0, 0, 255), -1)
+        
 
 print('Hello World')
 
-VideoCap=cv2.VideoCapture(1, cv2.CAP_DSHOW)
+VideoCap=cv2.VideoCapture(0)
 
 KF=KalmanFilter(0.1, [0, 0])
 
-
+ret, frame=VideoCap.read()
+print(frame.shape)
 cmapmine = colors.ListedColormap(['w', 'b'])
 
 while(True):
@@ -41,29 +47,17 @@ while(True):
     points, mask, contours=detect_inrange(frame, 10000, blue)
     gr_points, gr_mask, gr_contours=detect_inrange(frame, 800, green)
     
+    put_center_circle(frame,contours, points)
+    put_center_circle(frame,gr_contours, gr_points)
     
-    #put a cicrcle on the center of the object
-    center_points, center_contours = detect_center(frame, contours)
-    gr_center_points, gr_center_contours = detect_center(frame, gr_contours)
-    for i in points:
-        cv2.circle(frame, (i[0], i[1]), 7, (0, 0, 255), -1)
-        
-    for i in gr_points:
-        cv2.circle(frame, (i[0], i[1]), 7, (0, 255, 0), -1)
-
     
-
 
     cv2.imshow('image', frame)
     
-    if (len(points)>0):
-        cv2.circle(frame, (points[0][0], points[0][1]), 10, (0, 255, 0), 2)
+    #if (len(points)>0):
+    #    cv2.circle(frame, (points[0][0], points[0][1]), 10, (0, 255, 0), 2)
         
     
-    #if mask is not None:
-        # cv2.imshow('blue mask', mask)
-        #cv2.imshow('green mask', green_mask)
-
     
 
     if cv2.waitKey(1)&0xFF==ord('q'):
@@ -81,6 +75,7 @@ while(True):
                 y = points[i][0]
                 map[ x, y] = 1
                 occupancy_grid[int(x/reduction),int(y/reduction)]=1
+                print('maison')
                 for v in range(int(x/reduction),int(x/reduction +10)):
                     for w in range(int(y/reduction),int(y/reduction +10)):
                         if (v-5) <48 or  (w-5)<64:
@@ -91,13 +86,13 @@ while(True):
         
         
         
-        
         if (len(gr_points)>0):
             for i in range(len(gr_points)):
                 x = int(480-gr_points[i][1])
                 y = gr_points[i][0]
                 map[ x,y] = 2
                 occupancy_grid[int(x/reduction),int(y/reduction)]=0
+                print('place parking')
                 for v in range(int(x/reduction),int(x/reduction +10)):
                     for w in range(int(y/reduction),int(y/reduction +10)):
                         if (v-5) <48 or  (w-5)<64:
@@ -106,39 +101,9 @@ while(True):
         
         print(' les centres des obstacles sont')
         print(points)
-        print(map[ points[0][0], points[0][1] ])
-        print(points[0][0])
-
-        """
-        
-        for x in range(int(round(x_max)-1)):
-            for y in range(int(round(y_max)-1)):
-                # For each pixel, obstacle if color is white (255)
-                
-                if map[x,y] == 1:
-                    occupancy_grid[int(x/reduction),int(y/reduction)]=1
-                    #print(int(x/reduction),int(y/reduction)) 
-                    for v in range(int(x/reduction),int(x/reduction +10)):
-                        for w in range(int(y/reduction),int(y/reduction +10)):
-                            if (v-5) <48 or  (w-5)<64:
-                                if occupancy_grid[int(v-5),int(w-5)] != 2:
-                                    occupancy_grid[int(v-5),int(w-5)]=1
-                                    
-                       
-        for x in range(int(round(x_max)-1)):
-            for y in range(int(round(y_max)-1)):
-                # For each pixel, obstacle if color is white (255)       
-                if map[x,y] == 2:
-                    occupancy_grid[int(x/reduction),int(y/reduction)]=0
-                    #print(int(x/reduction),int(y/reduction)) 
-                    for v in range(int(x/reduction),int(x/reduction +4)):
-                        for w in range(int(y/reduction),int(y/reduction +10)):
-                            if (v-2) <48 or  (w-5)<64:
-                                occupancy_grid[int(v-2),int(w-5)]=0
-                
-        """
+        print(map[ 480 -points[0][1], points[0][0] ])
+        print(points[0][0])                   
                     
-                       
         
         row = np.ones((16,64))
         print('row shape')
