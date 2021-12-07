@@ -48,6 +48,7 @@ class Position:
 # ---- variable grobale
 
 KF=KalmanFilter(0.1, [0, 0])
+stop_video = False
 
 
 pose_robot_1 = Pose
@@ -59,14 +60,18 @@ goal = Position
 
 def put_center_circle(image, contours,points,color):
     #put a cicrcle on the center of the object
-    center_points, center_contours = detect_center(frame, contours)
+    center_points, center_contours = detect_center(image, contours)
     if (len(points)>0):
         for i in points:
-            cv2.circle(frame, (i[0], i[1]), 7, color, -1)
+            cv2.circle(image, (i[0], i[1]), 7, color, -1)
             
 def vision_initialization():
-    print('Hello World')
+    
     VideoCap=cv2.VideoCapture(0)
+    print('Hello World')
+    ret, frame=VideoCap.read()
+    
+    
     gr_points,  gr_mask, gr_contours=detect_inrange(frame, 10000, green)
     goal.x = gr_points[0][0]
     goal.y =480 -gr_points[0][1]
@@ -79,6 +84,7 @@ def vision_end(VideoCap):
     
 def mask_map_init(VideoCap):
     ret, frame=VideoCap.read()
+    
     bl_points, bl_mask, bl_contours=detect_inrange(frame, 10000, blue)
     return bl_mask
     
@@ -160,13 +166,13 @@ def angle_of_vectors(a,b,c,d):
 
 def setup_robot_pose(red_contours, red_points):
     if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
-        print('if')
+        #print('if')
         #calcul position
         pose_robot_1.x = red_points[0][0]
         pose_robot_1.y =480 - red_points[0][1]
-        print('x y du robot')
-        print(pose_robot_1.x)
-        print(pose_robot_1.y)
+        #print('x y du robot')
+        #print(pose_robot_1.x)
+        #print(pose_robot_1.y)
         
         #calcul vecteur
         pose_robot_2.x = red_points[1][0]
@@ -174,50 +180,36 @@ def setup_robot_pose(red_contours, red_points):
         #print(red_points[1][0])
         #print(pose_robot_2.x)
     else:
-        print('else')
+        #print('else')
         #calcul position
         pose_robot_1.x = red_points[0][0]
         pose_robot_1.y = 480 - red_points[0][1]
         #print(red_points[0][0])
+        
         #calcul vecteur
         pose_robot_2.x = red_points[1][0]
         pose_robot_2.y = 480 - red_points[1][1]
-        print('x y du robot')
-        print(pose_robot_1.x)
-        print(pose_robot_1.y)
+        #print('x y du robot')
+        #print(pose_robot_1.x)
+        #print(pose_robot_1.y)
         
     
     #vecteur 
     vector.x = red_points[1][0] - red_points[0][0]
     vector.y = red_points[1][1] - red_points[0][1]
     angle = angle_of_vectors(vector.x,vector.y,1,0)
-    print('l angle')
-    print(angle)
+    #print('l angle')
+    #print(angle)
     
-
-
-# ---- MAIN ----
-
-#VideoCap=cv2.VideoCapture(0)
-
-#VideoCap = vision_initialization
-
-VideoCap=cv2.VideoCapture(0)
-
-while(True):
+def update(VideoCap):
+    stop_video = False
     ret, frame=VideoCap.read()
-    
-    
-    
-    
+        
+            
     red_points, red_mask, red_contours = detect_inrange(frame, 50, red)
     
     put_center_circle(frame,red_contours, red_points, ROUGE)
         
-    
-
-    
-    
     #get the points of the robot
     if(len(red_points)>1):
         cv2.arrowedLine(frame,
@@ -225,12 +217,10 @@ while(True):
                     color=(0, 255, 0),
                     thickness=3,
                     tipLength=0.2)
-        print('arrowed')
+        #print('arrowed')
         
     etat=KF.predict().astype(np.int32)
     
-    
-      
     
     if(len(red_points)>0):
         cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, (0,255,0), 5)
@@ -240,19 +230,31 @@ while(True):
             print('robot detected')
             setup_robot_pose(red_contours, red_points)
             # show a vector for the orientation
-           
             
-           
+        
     cv2.imshow('image', frame)
     
-     
     if cv2.waitKey(1)&0xFF==ord('q'):
         print('le bouton quitter')
         
-         
         vision_end(VideoCap)
-
+        stop_video =True  
         
-        break    
+    return pose_robot_1.x, pose_robot_1.y, pose_robot_1.angle, stop_video
+        
+
+
+# ---- MAIN ----
+
+
+
+#VideoCap=cv2.VideoCapture(0)
+
+#VideoCap = vision_initialization
+
+#VideoCap=cv2.VideoCapture(0)
+
+
+     
 
         

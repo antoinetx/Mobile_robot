@@ -76,18 +76,18 @@ def move_to_position(x_robot, y_robot, angle_robot, x_goal, y_goal):
     y = y_robot
     theta = angle_robot # voir comment imposer entre [-pi, pi]
     
-    x_right, x_left , y_right, y_left = initialization_motor(x,y,theta)
+    #x_right, x_left , y_right, y_left = initialization_motor(x,y,theta)
         
     # distance computation respectively to the center
     dist_center = compute_distance(x_goal, y_goal, x, y)
     x_traj, y_traj = [], []
     
     # distance computation respectively to the right wheel    
-    dist_right = compute_distance(x_goal, y_goal, x_right, y_right) 
+    #dist_right = compute_distance(x_goal, y_goal, x_right, y_right) 
     x_traj_right, y_traj_right = [], []
     
     # distance computation respectively to the left wheel 
-    dist_left = compute_distance(x_goal, y_goal, x_left, y_left)
+    #dist_left = compute_distance(x_goal, y_goal, x_left, y_left)
     x_traj_left, y_traj_left = [], []
     
     while dist_center > 1 :
@@ -96,8 +96,8 @@ def move_to_position(x_robot, y_robot, angle_robot, x_goal, y_goal):
 
         # update the distance 
         dist_center = compute_distance(x_goal, y_goal, x, y)
-        dist_right = compute_distance(x_goal, y_goal, x_right, y_right)
-        dist_left = compute_distance(x_goal, y_goal, x_left, y_left)
+        #dist_right = compute_distance(x_goal, y_goal, x_right, y_right)
+        #dist_left = compute_distance(x_goal, y_goal, x_left, y_left)
 
         # definition of angle alpha
         x_diff = x_goal - x
@@ -116,7 +116,7 @@ def move_to_position(x_robot, y_robot, angle_robot, x_goal, y_goal):
         theta = theta + w * dt
         x = x + v * np.cos(theta) * dt
         y = y + v * np.sin(theta) * dt
-        x_right, x_left , y_right, y_left = initialization_motor(x,y,theta)
+        #x_right, x_left , y_right, y_left = initialization_motor(x,y,theta)
                     
         
 
