@@ -101,11 +101,9 @@ def play_music():
 
 
 @tdmclient.notebook.sync_var
-def check_cars(state=1, Tres_high=1400, Tres_mid_side_high=1500, Tres_low=1500, Tres_mid_side_low=1000, Tres_side_high=2000):
-    global prox_horizontal
+def check_cars(Tres_high=1400, Tres_mid_side_high=1500, Tres_low=1500, Tres_mid_side_low=1000, Tres_side_high=2000, prox_horizonta=0):
 
- 
-    if((prox_horizontal[2]>Tres_high)or(prox_horizontal[1]>Tres_mid_side_high)or(prox_horizontal[3]>Tres_mid_side_high)):
+    if((prox_horizonta[2]>Tres_high)or(prox_horizonta[1]>Tres_mid_side_high)or(prox_horizonta[3]>Tres_mid_side_high)):
         return True        
     #There's something in front of Thymio --> avoid_function take the control
     else:
@@ -128,15 +126,15 @@ def check_cars(state=1, Tres_high=1400, Tres_mid_side_high=1500, Tres_low=1500, 
 
 
 @tdmclient.notebook.sync_var
-def avoid_obstacle(Tres_side_high=1200, Tres_side_low=500, Tres_low=1500, Tres = 100):
-    global left_obstacle, right_obstacle, prox_horizontal, sound_system
+def avoid_obstacle(Tres_side_high=1200, Tres_side_low=500, Tres_low=1500, Tres = 100, prox_horizonta=0):
+    global left_obstacle, right_obstacle
     speed0 = 100       # nominal speed
     obstSpeedGain = 5  # /100 (actual gain: 5/100=0.05)
     
     #play_music()
     
     # acquisition from the proximity sensors to detect obstacles
-    obst = [prox_horizontal[0], prox_horizontal[4], prox_horizontal[2],prox_horizontal[1], prox_horizontal[3]]
+    obst = [prox_horizonta[0], prox_horizonta[4], prox_horizonta[2],prox_horizonta[1], prox_horizonta[3]]
     
     #check left (in order to know if Thymio is bloqued)
     if(obst[0]>Tres_side_high):
