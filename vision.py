@@ -128,6 +128,7 @@ def get_goal():
     return goal.x, goal.y
 def angle_of_vectors(a,b,c,d):
     
+    
     vec_a = np.array([a, b])
     vec_b = np.array([c, d])
 
@@ -136,6 +137,9 @@ def angle_of_vectors(a,b,c,d):
 
     cos = inner / norms
     rad = np.arccos(np.clip(cos, -1.0, 1.0))
+    
+    if b > 0:
+        rad = rad * (-1)
     
     return rad
      
@@ -159,11 +163,14 @@ goal = Position
 while(True):
         
     ret, frame=VideoCap.read()
+   # print (' la frame est')
+   # print(frame.shape)
+    
     
     bl_points, bl_mask, bl_contours=detect_inrange(frame, 10000, blue)
     gr_points,  gr_mask, gr_contours=detect_inrange(frame, 10000, green)
 
-    red_points, red_mask, red_contours=detect_inrange(frame, 1000, red)
+    red_points, red_mask, red_contours=detect_inrange(frame, 50, red)
     
     #get the points of the robot
     etat=KF.predict().astype(np.int32)
@@ -186,33 +193,36 @@ while(True):
                 print('if')
                 #calcul position
                 pose_robot_1.x = red_points[0][0]
-                pose_robot_1.y = red_points[0][1]
+                pose_robot_1.y =480 - red_points[0][1]
+                print('x y du robot')
                 print(pose_robot_1.x)
+                print(pose_robot_1.y)
                 
                 #calcul vecteur
                 pose_robot_2.x = red_points[1][0]
-                pose_robot_2.y = red_points[1][1]
-                print(red_points[1][0])
-                print(pose_robot_2.x)
+                pose_robot_2.y =480 -  red_points[1][1]
+                #print(red_points[1][0])
+                #print(pose_robot_2.x)
             else:
                 print('else')
                 #calcul position
                 pose_robot_1.x = red_points[0][0]
-                pose_robot_1.y = red_points[0][1]
-                print(red_points[0][0])
+                pose_robot_1.y = 480 - red_points[0][1]
+                #print(red_points[0][0])
                 #calcul vecteur
                 pose_robot_2.x = red_points[1][0]
-                pose_robot_2.y = red_points[1][1]
-                print(red_points[1][0])
-                print(pose_robot_2.x)
+                pose_robot_2.y = 480 - red_points[1][1]
+                print('x y du robot')
+                print(pose_robot_1.x)
+                print(pose_robot_1.y)
                 
             
             #vecteur 
             vector.x = red_points[1][0] - red_points[0][0]
             vector.y = red_points[1][1] - red_points[0][1]
             angle = angle_of_vectors(vector.x,vector.y,1,0)
-            #print('l angle')
-            #print(angle)
+            print('l angle')
+            print(angle)
             #print(vector.x)
             #print(vector.y)
     
@@ -239,9 +249,9 @@ while(True):
         
         print('--- le mask dans video.py ---')
         #print(mask)
-        print(bl_mask.shape)
-        if bl_mask is not None:
-            cv2.imshow('mask', bl_mask)
+        #print(bl_mask.shape)
+        # if bl_mask is not None:
+        #    cv2.imshow('mask', bl_mask)
         
 
         
