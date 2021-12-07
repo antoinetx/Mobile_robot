@@ -26,9 +26,33 @@ class Map :
     #def update_map(self, new_grid):
     #    self._grid = new_grid
 
-    def get_lenght(self):
-        return self._nb_square_by_side
+    #def get_lenght(self):
+        #return self._nb_square_by_side
     
+    def security_grid_expand(self, frame, robot_len = 0.10, security_margin = 0.03):
+        """
+        Expand the grid to avoid the robot colyding whit an obstacle
+        :param frame: the video frame 
+        :save in map._grid: save the new expand grid
+        :return: the new expand grid
+        """
+        robot_lenght = robot_len # 10 cm
+        marge = security_margin # 3 cm de marge
+        sec_square = math.ceil((robot_lenght/2)/self._square_size_m) + math.ceil(marge/self._square_size_m)
+
+        len_i = len(frame)
+        len_j = len(frame[0])
+        
+        new_frame = np.zeros((len_i,len_j))
+
+        for i in range(len_i):
+            if sum(frame[i,:] != 0): # this if allow to avoid the second loop if there is no obstacle on this line
+                for j in range(len_j):
+                    if frame[i][j] > 10:
+                        new_frame[(i-sec_square):(i+sec_square),(j-sec_square):(j+sec_square)] = 1
+
+        self._grid = new_frame # Save the new grid in the object
+        return new_frame
     
     
     def init_grid(self, frame):
@@ -44,7 +68,14 @@ class Map :
         
         print('Resized Dimensions : ',resized_frame.shape)
         
-        self._grid = resized_frame
+        cv2.imshow("rezize mask", resized_frame)
+        
+        
+    
+        secured_frame = self.security_grid_expand(resized_frame)
+        
+        self._grid = secured_frame
+        
         self._grid_init = True
         
     
@@ -57,30 +88,6 @@ class Map :
         plt.show()
 
 
-    def security_grid_expand(self, frame, robot_len = 0.10, security_margin = 0.03):
-        """
-        Expand the grid to avoid the robot colyding whit an obstacle
-        :param frame: the video frame 
-        :save in map._grid: save the new expand grid
-        :return: the new expand grid
-        """
-        robot_lenght = robot_len # 10 cm
-        marge = security_margin # 3 cm de marge
-        sec_square = math.ceil((robot_lenght/2)/self._square_size_m) + math.ceil(marge/self._square_size_m)
-
-        len_i = len(frame)
-        len_j = len(frame[0])
-
-        new_frame = np.zeros((len_i,len_j))
-
-        for i in range(len_i):
-            if sum(frame[i,:] != 0): # this if allow to avoid the second loop if there is no obstacle on this line
-                for j in range(len_j):
-                    if frame[i,j] == 1:
-                        new_frame[(i-sec_square):(i+sec_square),(j-sec_square):(j+sec_square)] = 0.5
-
-        self._grid = new_frame # Save the new grid in the object
-        return new_frame
     
     
     
