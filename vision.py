@@ -5,6 +5,7 @@ from KalmanFilter import KalmanFilter
 import sys
 import math
 import numpy as np
+import numpy.linalg as LA
 import matplotlib.pyplot as plt
 from matplotlib import colors
 from matplotlib.colors import ListedColormap
@@ -14,7 +15,7 @@ np.set_printoptions(threshold=sys.maxsize)
 
 blue = 120
 green = 60
-red = 0 # ou 10
+red = 150 # ou 10
 ROUGE = (0, 0, 255)
 GREEN = (0, 255, 0)
 BLEU = (255, 0, 0)
@@ -32,6 +33,15 @@ blue_hi=np.array([140, 255, 255])
 
 green_lo=np.array([40, 50, 50])
 green_hi=np.array([80, 255, 255])
+
+class Pose:
+    x = 0
+    y = 0
+    angle = 0
+    
+class Position:
+    x= 0
+    y=0
 
 
 def put_center_circle(image, contours,points,color):
@@ -104,6 +114,27 @@ def detect_center(image, contours):
     #print(f"x: {cx} y: {cy}")
     return center_points, center_contours
 
+def get_pose():
+    return pose_robot_1.x, pose_robot_1.y, pose_robot_1.angle
+
+  
+def get_goal():
+    return goal.x, goal.y
+def angle_of_vectors(a,b,c,d):
+    
+    vec_a = np.array([a, b])
+    vec_b = np.array([c, d])
+
+    inner = np.inner(vec_a, vec_b)
+    norms = LA.norm(vec_a) * LA.norm(vec_b)
+
+    cos = inner / norms
+    rad = np.arccos(np.clip(cos, -1.0, 1.0))
+    
+    return rad
+     
+
+
 # ---- MAIN ----
 
 VideoCap=cv2.VideoCapture(0)
@@ -113,37 +144,86 @@ red_color = np.uint8([[[0,0,255]]])
 hsv_red = cv2.cvtColor(red_color,cv2.COLOR_BGR2HSV)
 print(hsv_red)
 
+pose_robot_1 = Pose
+pose_robot_2 = Pose
+vector = Position
+goal = Position
+
+
 while(True):
         
     ret, frame=VideoCap.read()
     
     bl_points, bl_mask, bl_contours=detect_inrange(frame, 10000, blue)
-    gr_points, gr_mask, gr_contours=detect_inrange(frame, 800, green)
-    red_points, red_mask, red_contours=detect_inrange(frame, 800, red)
+    gr_points,  gr_mask, gr_contours=detect_inrange(frame, 10000, green)
+
+    red_points, red_mask, red_contours=detect_inrange(frame, 1000, red)
     
+    #get the points of the robot
     etat=KF.predict().astype(np.int32)
     
     cv2.circle(frame, (int(etat[0]), int(etat[1])), 2, (255, 0, 0), 5)
     # put an arrowd line for the speed
-    cv2.arrowedLine(frame,
-                    (int(etat[0]), int(etat[1])), (int(etat[0]+etat[2]), int(etat[1]+etat[3])),
-                    color=(0, 255, 0),
-                    thickness=3,
-                    tipLength=0.2)
+    if(len(red_points)>1):
+        cv2.arrowedLine(frame,
+                        (int(red_points[0][0]), int(red_points[0][1])), (int(red_points[1][0]), int(red_points[1][1])),
+                        color=(0, 255, 0),
+                        thickness=3,
+                        tipLength=0.2)
     
     if(len(red_points)>0):
         cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, (0,255,0), 5)
         KF.update(np.expand_dims(red_points[0],axis=-1))
-
+        
+        if(len(red_points)>1):
+            if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
+                print('if')
+                #calcul position
+                pose_robot_1.x = red_points[0][0]
+                pose_robot_1.y = red_points[0][1]
+                print(pose_robot_1.x)
+                
+                #calcul vecteur
+                pose_robot_2.x = red_points[1][0]
+                pose_robot_2.y = red_points[1][1]
+                print(red_points[1][0])
+                print(pose_robot_2.x)
+            else:
+                print('else')
+                #calcul position
+                pose_robot_1.x = red_points[0][0]
+                pose_robot_1.y = red_points[0][1]
+                print(red_points[0][0])
+                #calcul vecteur
+                pose_robot_2.x = red_points[1][0]
+                pose_robot_2.y = red_points[1][1]
+                print(red_points[1][0])
+                print(pose_robot_2.x)
+                
+            
+            #vecteur 
+            vector.x = red_points[1][0] - red_points[0][0]
+            vector.y = red_points[1][1] - red_points[0][1]
+            angle = angle_of_vectors(vector.x,vector.y,1,0)
+            print('l angle')
+            print(angle)
+            print(vector.x)
+            print(vector.y)
     
-    put_center_circle(frame,bl_contours, bl_points, ROUGE)
-    put_center_circle(frame,gr_contours, gr_points, GREEN)
+    #angle
+    #angle = angle_of_vectors(pose_robot_1.x,pose_robot_2.x,pose_robot_1.y,pose_robot_2.y)
+    
+    
+    put_center_circle(frame,red_contours, red_points, ROUGE)
+    #put_center_circle(frame,bl_contours, bl_points, ROUGE)
+    #put_center_circle(frame,gr_contours, gr_points, GREEN)
+    
+    
     
     
     cv2.imshow('image', frame)
     
-        
-
+     
 
     if cv2.waitKey(1)&0xFF==ord('q'):
         print('le bouton quitter')
@@ -153,7 +233,7 @@ while(True):
         #print(mask)
         print(bl_mask.shape)
         if bl_mask is not None:
-            cv2.imshow('mask', mask)
+            cv2.imshow('mask', bl_mask)
         
 
         
