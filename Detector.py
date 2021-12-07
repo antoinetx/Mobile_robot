@@ -57,3 +57,59 @@ def detect_center(image, contours):
                     """
     #print(f"x: {cx} y: {cy}")
     return center_points, center_contours
+
+def detect_obstacle(image_filtered):
+    reduction = 10
+    print(image_filtered.shape)
+    map = np.zeros((64,64))
+    print(np.unique(map))
+    
+    #if image_filtered[(image_filtered == 255 )]:
+    #    map[image_filtered[(image_filtered == 255 )]//10] = 1
+        
+    result = np.where(image_filtered == np.amax(image_filtered))
+    
+    print('List of coordinates of maximum value in Numpy array : ')
+    # zip the 2 arrays to get the exact coordinates
+    listOfCordinates = list(zip(result[0], result[1]))
+    
+    # travese over the list of cordinates
+    i=0
+    for cord in listOfCordinates:
+        i +=1;
+        if i < 10:
+            print(64 - int(cord[0]/reduction),  int(cord[1]/reduction))
+            print(64 - int(cord[0]),  int(cord[1]))
+        map[64 - int(cord[0]/reduction),  int(cord[1]/reduction) ] = 1
+        
+    
+    #print(np.where(image_filtered == 255 ))
+    #print(map)
+    
+    
+    print('La map filtree')
+    
+    print(np.unique(map))
+    print(map.shape)
+    
+    return map
+        
+    
+    """
+    if (len(points)>0):
+        for i in range(len(points)):
+            x = int(480-points[i][1])
+            y = points[i][0]
+            map[x, y] = 1
+            occupancy_grid[int(x/reduction),int(y/reduction)]=1
+            print('maison')
+            for v in range(int(x/reduction),int(x/reduction +10)):
+                for w in range(int(y/reduction),int(y/reduction +10)):
+                    if (v-5) <48 or  (w-5)<64:
+                        if occupancy_grid[int(v-5),int(w-5)] != 2:
+                            occupancy_grid[int(v-5),int(w-5)]=1
+            
+            print(points[i][0], points[i][1])
+            
+    """
+    

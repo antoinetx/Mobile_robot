@@ -1,7 +1,7 @@
 
 import cv2
 from Map import Map
-from Detector import detect_inrange, detect_center
+from Detector import detect_inrange, detect_center, detect_obstacle
 from KalmanFilter import KalmanFilter
 import sys
 #import v4l2capture
@@ -51,24 +51,49 @@ while(True):
     put_center_circle(frame,gr_contours, gr_points)
     
     
-
     cv2.imshow('image', frame)
     
     #if (len(points)>0):
     #    cv2.circle(frame, (points[0][0], points[0][1]), 10, (0, 255, 0), 2)
         
     
-    
 
     if cv2.waitKey(1)&0xFF==ord('q'):
         print('le bouton quitter')
-        occupancy_grid=np.zeros((round(x_max/reduction),round(y_max/reduction)))
+        occupancy_grid=np.zeros((64,64))
         print('la taille de l occupancy grid est')
         print(occupancy_grid.shape)
 
- 
-        map = np.zeros((480, 640))
+        lausanne = Map(5,64)
+        
+        print('--- le mask dans video.py ---')
+        #print(mask)
+        print(mask.shape)
+        if mask is not None:
+            cv2.imshow('mask', mask)
+        
+        map_compressed = detect_obstacle(mask)
+        print('--- map_compressed ---')
+        print(map_compressed.shape)
+        print(np.unique(map_compressed))
+        
+        
+        #lausanne._grid = map_compressed
+        #map = np.zeros((480, 640))
+        lausanne.update_map(map_compressed)
+        #print(lausanne.get_map.shape)
+        occupancy_grid = map_compressed
+        
+        # Colors treshold initialisation
+        r = [150, 255]
+        g = [150, 255]
+        b = [150, 255]
 
+
+       # lausanne.init_grid(frame, r, g, b)
+       # lausanne.grid_show()
+
+        """
         if (len(points)>0):
             for i in range(len(points)):
                 x = int(480-points[i][1])
@@ -112,8 +137,11 @@ while(True):
         print('taille final')
         print(occupancy_grid.shape)
         print('affichage')
-        #print(occupancy_grid[int(points[0][0]/reduction),int(points[0][1]/reduction)])
-        #print(int(points[0][0]/reduction),int(points[0][1]/reduction))
+        
+        
+        """
+        
+       
         
         fig,  ax = plt.subplots(1)
         max_val = 64
@@ -133,6 +161,8 @@ while(True):
 
         map = occupancy_grid
         plt.show()
+        
+        
                         
         VideoCap.release()
         cv2.destroyAllWindows()

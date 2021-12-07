@@ -24,12 +24,6 @@ while True:
         break
 
 
-
-
-
-
-
-
     """
     
     def return_camera_indices():
