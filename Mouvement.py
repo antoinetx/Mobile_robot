@@ -1,37 +1,13 @@
 
 
+from asgiref.sync import sync_to_async
+import tdmclient
 import matplotlib.pyplot as plt
 import numpy as np
 from random import random
 
 
 test_functions = True
-
-
-# Test that the motors work
-
-
-@tdmclient.notebook.sync_var
-def motors(l_speed=500, r_speed=500, verbose=False):
-    """
-    Sets the motor speeds of the Thymio 
-    param l_speed: left motor speed
-    param r_speed: right motor speed
-    param verbose: whether to print status messages or not
-    """
-    global motor_left_target, motor_right_target
-    # Printing the speeds if requested
-    if verbose:
-        print("\t\t Setting speed : ", l_speed, r_speed)
-    motor_left_target = l_speed
-    motor_right_target = r_speed
-
-if test_functions:
-    motors(100, 100) #test with lower speed value
-    sleep(2)
-    motors(0, 0)
-
-
 # ## Move from point A to point B
 
 # simulation parameters 
@@ -142,14 +118,15 @@ def move_to_position(x_robot, y_robot, angle_robot, x_goal, y_goal):
         y = y + v * np.sin(theta) * dt
         x_right, x_left , y_right, y_left = initialization_motor(x,y,theta)
                     
-        motors(speed_l,speed_r)
+        
 
     if dist_center <= 1 :
-        motors(0,0)
+        speed_l = 0
+        speed_r = 0
 
-        
-if test_functions :
-    move_to_position(0,0,0,2000,100)
+    return speed_l, speed_r 
+
+
 
 
 
