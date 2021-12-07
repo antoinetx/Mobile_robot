@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import cv2
 
 
 class Map :
@@ -28,13 +29,70 @@ class Map :
     def get_lenght(self):
         return self._nb_square_by_side
     
-    def init_grid(self, frame, r_tresh, g_tresh, b_tresh):
+    
+    
+    def init_grid(self, frame):
+        
+        pourcentage = (self._wanted_nb_square_by_side/frame.shape[0])
+
+        width = int(frame.shape[1] * pourcentage )
+        height = int(frame.shape[0] * pourcentage )
+        dim = (width, height)
+
+        # resize image
+        resized_frame = cv2.resize(frame, dim, interpolation = cv2.INTER_AREA)
+        
+        print('Resized Dimensions : ',resized_frame.shape)
+        
+        self._grid = resized_frame
+        self._grid_init = True
+        
+    
+    def grid_show(self):
         """
-        Create an OccupancyGridMap from a video frame
+        Plot the _grid
+        """
+        plt.imshow(self._grid, vmin=0, vmax=1, origin='lower', interpolation='none', alpha=1)
+        plt.draw()
+        plt.show()
+
+
+    def security_grid_expand(self, frame, robot_len = 0.10, security_margin = 0.03):
+        """
+        Expand the grid to avoid the robot colyding whit an obstacle
         :param frame: the video frame 
-        :param r_tresh, g_tresh, b_tresh: the treshold to choose wich color to extract (each tes between 0and 255)
-        :Save in map._grid: the created grid map
+        :save in map._grid: save the new expand grid
+        :return: the new expand grid
         """
+        robot_lenght = robot_len # 10 cm
+        marge = security_margin # 3 cm de marge
+        sec_square = math.ceil((robot_lenght/2)/self._square_size_m) + math.ceil(marge/self._square_size_m)
+
+        len_i = len(frame)
+        len_j = len(frame[0])
+
+        new_frame = np.zeros((len_i,len_j))
+
+        for i in range(len_i):
+            if sum(frame[i,:] != 0): # this if allow to avoid the second loop if there is no obstacle on this line
+                for j in range(len_j):
+                    if frame[i,j] == 1:
+                        new_frame[(i-sec_square):(i+sec_square),(j-sec_square):(j+sec_square)] = 0.5
+
+        self._grid = new_frame # Save the new grid in the object
+        return new_frame
+    
+    
+    
+    
+    """
+    def init_grid2(self, frame, r_tresh, g_tresh, b_tresh):
+    """
+    #Create an OccupancyGridMap from a video frame
+    #:param frame: the video frame 
+    #:param r_tresh, g_tresh, b_tresh: the treshold to choose wich color to extract (each tes between 0and 255)
+    #:Save in map._grid: the created grid map
+    """
         self._square_pixe_size = math.floor(len(frame)/self._wanted_nb_square_by_side)
         self._nb_square_by_side = math.ceil(len(frame)/self._square_pixe_size)
         self._square_size_m = self._lenght_m/self._nb_square_by_side # Not the exact value 
@@ -83,37 +141,4 @@ class Map :
         # Save the data in the map variable _grid
         self._grid = data_i
         self._grid_init = True
-        
-    def grid_show(self):
-        """
-        Plot the _grid
-        """
-        plt.imshow(self._grid, vmin=0, vmax=1, origin='lower', interpolation='none', alpha=1)
-        plt.draw()
-        plt.show()
-
-
-    def security_grid_expand(self, frame):
-        """
-        Expand the grid to avoid the robot colyding whit an obstacle
-        :param frame: the video frame 
-        :save in map._grid: save the new expand grid
-        :return: the new expand grid
-        """
-        robot_lenght = 0.10 # 10 cm
-        marge = 0.03 # 3 cm de marge
-        sec_square = math.ceil((robot_lenght/2)/self._square_size_m) + math.ceil(marge/self._square_size_m)
-
-        len_i = len(frame)
-        len_j = len(frame[0])
-
-        new_frame = np.zeros((len_i,len_j))
-
-        for i in range(len_i):
-            if sum(frame[i,:] != 0): # this if allow to avoid the second loop if there is no obstacle on this line
-                for j in range(len_j):
-                    if frame[i,j] == 1:
-                        new_frame[(i-sec_square):(i+sec_square),(j-sec_square):(j+sec_square)] = 0.5
-
-        self._grid = new_frame # Save the new grid in the object
-        return new_frame
+    """
