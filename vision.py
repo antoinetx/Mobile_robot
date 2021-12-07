@@ -62,6 +62,12 @@ def vision_end(VideoCap):
     VideoCap.release()
     cv2.destroyAllWindows()
     
+def mask_map_init():
+    ret, frame=VideoCap.read()
+    bl_points, bl_mask, bl_contours=detect_inrange(frame, 10000, blue)
+    return bl_mask
+    
+    
 def mask_function(image, lo, hi):
     image=cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     image=cv2.blur(image, (5, 5))
@@ -205,10 +211,10 @@ while(True):
             vector.x = red_points[1][0] - red_points[0][0]
             vector.y = red_points[1][1] - red_points[0][1]
             angle = angle_of_vectors(vector.x,vector.y,1,0)
-            print('l angle')
-            print(angle)
-            print(vector.x)
-            print(vector.y)
+            #print('l angle')
+            #print(angle)
+            #print(vector.x)
+            #print(vector.y)
     
     #angle
     #angle = angle_of_vectors(pose_robot_1.x,pose_robot_2.x,pose_robot_1.y,pose_robot_2.y)
@@ -222,6 +228,8 @@ while(True):
     
     
     cv2.imshow('image', frame)
+    if bl_mask is not None:
+        cv2.imshow('mask', bl_mask)
     
      
 
