@@ -198,6 +198,7 @@ def setup_robot_pose(red_contours, red_points):
     vector.x = red_points[1][0] - red_points[0][0]
     vector.y = red_points[1][1] - red_points[0][1]
     angle = angle_of_vectors(vector.x,vector.y,1,0)
+    pose_robot_1.angle = angle
     #print('l angle')
     #print(angle)
     
@@ -227,7 +228,7 @@ def update(VideoCap):
         KF.update(np.expand_dims(red_points[0],axis=-1))
         
         if(len(red_points)>1):
-            print('robot detected')
+            #print('robot detected')
             setup_robot_pose(red_contours, red_points)
             # show a vector for the orientation
             
