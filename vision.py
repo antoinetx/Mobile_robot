@@ -15,7 +15,7 @@ np.set_printoptions(threshold=sys.maxsize)
 
 blue = 120
 green = 60
-red = 150 # ou 10
+red = 180 # ou 10
 ROUGE = (0, 0, 255)
 GREEN = (0, 255, 0)
 BLEU = (255, 0, 0)
@@ -207,7 +207,7 @@ def update(VideoCap, factor_reduc, kalman_bool):
     ret, frame=VideoCap.read()
         
             
-    red_points, red_mask, red_contours = detect_inrange(frame, 50, red)
+    red_points, red_mask, red_contours = detect_inrange(frame, 300, red)
     
     put_center_circle(frame,red_contours, red_points, ROUGE)
         
