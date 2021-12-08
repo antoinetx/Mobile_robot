@@ -145,8 +145,8 @@ def get_pose():
     return pose_robot_1.x, pose_robot_1.y, pose_robot_1.angle
 
   
-def get_goal():
-    return goal.x, goal.y
+def get_goal(factor_reduc):
+    return goal.x*factor_reduc, goal.y*factor_reduc
 
 def angle_of_vectors(a,b,c,d):
        
@@ -202,7 +202,7 @@ def setup_robot_pose(red_contours, red_points):
     #print('l angle')
     #print(angle)
     
-def update(VideoCap):
+def update(VideoCap, factor_reduc, kalman_bool):
     stop_video = False
     ret, frame=VideoCap.read()
         
@@ -241,7 +241,10 @@ def update(VideoCap):
         vision_end(VideoCap)
         stop_video =True  
         
-    return pose_robot_1.x, pose_robot_1.y, pose_robot_1.angle, stop_video
+    if kalman_bool == False:
+        return  pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc, pose_robot_1.angle, stop_video
+    else:
+        return int(etat[0]) * factor_reduc, int(etat[1])*factor_reduc, pose_robot_1.angle, stop_video
         
 
 
@@ -254,6 +257,9 @@ def update(VideoCap):
 #VideoCap = vision_initialization
 
 #VideoCap=cv2.VideoCapture(0)
+
+#while(True):
+    
 
 
      
