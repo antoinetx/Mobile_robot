@@ -28,13 +28,13 @@ sensitivity = 20
 #green_hi=np.array([80, 255, 255])
 
 class Pose:
-    x = 0
-    y = 0
+    x = -1
+    y = -1
     angle = 0
     
 class Position:
-    x= 0
-    y=0
+    x= -1
+    y=- 1
 
 
 
