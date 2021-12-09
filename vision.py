@@ -177,13 +177,13 @@ def setup_robot_pose(red_contours, red_points):
     else:
         print('else')
         #calcul position
-        pose_robot_1.x = red_points[0][0]
-        pose_robot_1.y = 480 - red_points[0][1]
+        pose_robot_1.x = red_points[1][0]
+        pose_robot_1.y = 480 - red_points[1][1]
         #print(red_points[0][0])
         
         #calcul vecteur
-        pose_robot_2.x = red_points[1][0]
-        pose_robot_2.y = 480 - red_points[1][1]
+        pose_robot_2.x = red_points[0][0]
+        pose_robot_2.y = 480 - red_points[0][1]
         #print('x y du robot')
         #print(pose_robot_1.x)
         #print(pose_robot_1.y)
