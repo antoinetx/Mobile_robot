@@ -15,25 +15,17 @@ np.set_printoptions(threshold=sys.maxsize)
 
 blue = 120
 green = 60
-red = 180 # ou 10
+red = 150 # ou 10
 ROUGE = (0, 0, 255)
 GREEN = (0, 255, 0)
 BLEU = (255, 0, 0)
-map = np.zeros((64,64))
-reduction = 10
-x_max = int(480)
-y_max = int(640)
 
-#blue = 120
-blue = 100
-green = 60
 sensitivity = 20
 
-blue_lo=np.array([100, 50, 50])
-blue_hi=np.array([140, 255, 255])
-
-green_lo=np.array([40, 50, 50])
-green_hi=np.array([80, 255, 255])
+#blue_lo=np.array([100, 50, 50])
+#blue_hi=np.array([140, 255, 255])
+#green_lo=np.array([40, 50, 50])
+#green_hi=np.array([80, 255, 255])
 
 class Pose:
     x = 0
@@ -47,7 +39,6 @@ class Position:
 
 
 # ---- variable grobale
-
 KF=KalmanFilter(0.1, [0, 0])
 stop_video = False
 
@@ -58,7 +49,7 @@ vector = Position
 goal = Position
 
 
-
+# ------ display function ------
 def put_center_circle(image, contours,points,color):
     #put a cicrcle on the center of the object
     center_points, center_contours = detect_center(image, contours)
@@ -66,31 +57,8 @@ def put_center_circle(image, contours,points,color):
         for i in points:
             cv2.circle(image, (i[0], i[1]), 7, color, -1)
             
-def init_goal(frame):
-    
-    
-    gr_points,  gr_mask, gr_contours=detect_inrange(frame, 10000, green)
-    
-    if (len(gr_points)>0):
-        goal.x = gr_points[0][0]
-        goal.y =480 - gr_points[0][1]
-    else:
-        print('No parking slot free')
-        
-    return 
+# ------ detector function -------
 
-    
-def vision_end(VideoCap):
-    VideoCap.release()
-    cv2.destroyAllWindows()
-    
-def mask_map_init(VideoCap):
-    ret, frame=VideoCap.read()
-    
-    bl_points, bl_mask, bl_contours=detect_inrange(frame, 10000, blue)
-    return bl_mask
-    
-    
 def mask_function(image, lo, hi):
     image=cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     image=cv2.blur(image, (5, 5))
@@ -98,7 +66,7 @@ def mask_function(image, lo, hi):
     mask=cv2.erode(mask, None, iterations=2)
     mask=cv2.dilate(mask, None, iterations=2)
     return mask
-    
+
 def detect_inrange(image, surface, color):
     points=[]
     lo=np.array([color - sensitivity, 50, 50])
@@ -134,22 +102,10 @@ def detect_center(image, contours):
             
             center_points.append(np.array([int(cx), int(cy)]))
             center_contours.append(i)
-            """
-            cv2.drawContours(image, [i], -1, (0, 255, 0), 2)
-            cv2.circle(image, (cx, cy), 7, (0, 0, 255), -1)
-            cv2.putText(image, "center", (cx - 20, cy - 20),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
-                    """
-    #print(f"x: {cx} y: {cy}")
+ 
     return center_points, center_contours
 
-def get_pose():
-    return pose_robot_1.x, pose_robot_1.y, pose_robot_1.angle
-
-  
-def get_goal(factor_reduc):
-    goal_vect = (goal.x*factor_reduc, goal.y*factor_reduc)
-    return goal_vect
+# ------ maths function --------
 
 def angle_of_vectors(a,b,c,d):
        
@@ -166,6 +122,41 @@ def angle_of_vectors(a,b,c,d):
         rad = rad * (-1)
     
     return rad
+
+# ------ vision function  -------
+            
+def init_goal(frame, factor_reduc):
+    
+    goal_vect = (0, 0)
+    gr_points,  gr_mask, gr_contours=detect_inrange(frame, 10000, green)
+    
+    if (len(gr_points)>0):
+        goal.x = gr_points[0][0]
+        goal.y =480 - gr_points[0][1]
+    else:
+        print('No parking slot free')
+        
+    goal_vect = (goal.x*factor_reduc, goal.y*factor_reduc)
+    
+    return goal_vect
+
+
+    
+def vision_end(VideoCap):
+    VideoCap.release()
+    cv2.destroyAllWindows()
+    
+def mask_map_init(VideoCap):
+    ret, frame=VideoCap.read()
+    
+    bl_points, bl_mask, bl_contours=detect_inrange(frame, 10000, blue)
+    
+    if (len(bl_points)>0):
+        for i in bl_points:
+            cv2.circle(frame, (i[0], i[1]), 7, (0, 0, 255), -1)
+    return bl_mask
+    
+
 
 def setup_robot_pose(red_contours, red_points):
     if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
@@ -205,12 +196,12 @@ def setup_robot_pose(red_contours, red_points):
     #print('l angle')
     #print(angle)
     
-def update(frame, factor_reduc, kalman_bool):
-    
-    stop_video = False
+def update(frame, factor_reduc):
             
-    red_points, red_mask, red_contours = detect_inrange(frame, 300, red)
     
+    red_points, red_mask, red_contours = detect_inrange(frame, 800, red)
+    
+    #display the vector and points
     put_center_circle(frame,red_contours, red_points, ROUGE)
         
     #get the points of the robot
@@ -221,49 +212,57 @@ def update(frame, factor_reduc, kalman_bool):
                     thickness=3,
                     tipLength=0.2)
         #print('arrowed')
-        
-    etat=KF.predict().astype(np.int32)
+      
+      
+    #etat=KF.predict().astype(np.int32)
     
-    
+    # calculate the position
     if(len(red_points)>0):
         cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, (0,255,0), 5)
-        KF.update(np.expand_dims(red_points[0],axis=-1))
+        #KF.update(np.expand_dims(red_points[0],axis=-1))
         
         if(len(red_points)>1):
             #print('robot detected')
             setup_robot_pose(red_contours, red_points)
-            # show a vector for the orientation
             
+    
+    
         
+    #if kalman_bool == False:
+        return  (pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc), pose_robot_1.angle, stop_video
+    #else:
+    #    return int(etat[0]) * factor_reduc, int(etat[1])*factor_reduc, pose_robot_1.angle, stop_video
+    
+    
+    
+def display (frame, bool_bl, bool_gr, bool_red):
+    
+    if bool_bl:
+        bl_points, bl_mask, bl_contours = detect_inrange(frame, 1000, blue)
+        put_center_circle(frame,bl_contours, bl_points, ROUGE)
+        
+    if bool_gr:
+        gr_points, gr_mask, gr_contours = detect_inrange(frame, 1000, green)
+        put_center_circle(frame,gr_contours, gr_points, ROUGE)
+        
+    if bool_red:
+        red_points, red_mask, red_contours = detect_inrange(frame, 50, red)
+        put_center_circle(frame,red_contours, red_points, ROUGE)
+        if(len(red_points)>1):
+            cv2.arrowedLine(frame,
+                    (int(red_points[0][0]), int(red_points[0][1])), (int(red_points[1][0]), int(red_points[1][1])),
+                    color=(0, 255, 0),
+                    thickness=3,
+                    tipLength=0.2)
+        #print('arrowed')
+    
     cv2.imshow('image', frame)
     
-    """
-    if cv2.waitKey(1)&0xFF==ord('q'):
-        print('le bouton quitter')
-        
-        vision_end(VideoCap)
-        stop_video =True  
-    """
-        
-    if kalman_bool == False:
-        return  (pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc), pose_robot_1.angle
-    else:
-        return (int(etat[0]) * factor_reduc, int(etat[1])*factor_reduc), pose_robot_1.angle
-        
-
-
-# ---- MAIN ----
-
-
-
-#VideoCap=cv2.VideoCapture(0)
-
-#VideoCap = vision_initialization
-
-#VideoCap=cv2.VideoCapture(0)
-
-#while(True):
     
+    
+        
+
+
 
 
      
