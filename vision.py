@@ -132,13 +132,14 @@ def init_goal(frame, factor_reduc):
     print(' la position goal')
     print(gr_points)
     
+    
     if (len(gr_points)>0):
         goal.x = gr_points[0][0]
-        goal.y =480 - gr_points[0][1]
+        goal.y = frame.shape[0] - gr_points[0][1]
     else:
         print('No parking slot free')
         
-    goal_vect = (goal.x*factor_reduc, goal.y*factor_reduc)
+    goal_vect = (int(goal.x*factor_reduc), int(goal.y*factor_reduc))
     
     
     return goal_vect
@@ -149,8 +150,7 @@ def vision_end(VideoCap):
     VideoCap.release()
     cv2.destroyAllWindows()
     
-def mask_map_init(VideoCap):
-    ret, frame=VideoCap.read()
+def mask_map_init(frame):
     
     bl_points, bl_mask, bl_contours=detect_inrange(frame, 10000, blue)
     
@@ -227,7 +227,7 @@ def update(frame, factor_reduc):
         setup_robot_pose(red_contours, red_points)
             
     
-    return  (pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc), pose_robot_1.angle
+    return  (int(pose_robot_1.x * factor_reduc), int(pose_robot_1.y*factor_reduc)), pose_robot_1.angle
     
     
     

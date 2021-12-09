@@ -28,9 +28,9 @@ class Map :
 
     def set_map_lenght(self, frame):
         
-        pourcentage = (self._wanted_nb_square_by_side/max(frame.shape))
-        width = int(frame.shape[0] * pourcentage )
-        height = int(frame.shape[1] * pourcentage )
+        pourcentage = (self._wanted_nb_square_by_side/frame.shape[0])
+        width = int(frame.shape[1] * pourcentage )
+        height = int(frame.shape[0] * pourcentage )  
         self.map_lenght_in_square = (width,height)
         self._pourcentage = pourcentage
         
@@ -64,7 +64,7 @@ class Map :
         for i in range(len_i):
             if sum(frame[i,:] != 0): # this if allow to avoid the second loop if there is no obstacle on this line
                 for j in range(len_j):
-                    if frame[i][j] > 10:
+                    if frame[i][j] > 50:
                         new_frame[(i-sec_square):(i+sec_square),(j-sec_square):(j+sec_square)] = 1
 
         self._grid = new_frame # Save the new grid in the object
@@ -73,22 +73,26 @@ class Map :
     
     def init_grid(self, frame):
         
+        frame =np.flipud(frame)
+        frame = np.transpose(frame)
         pourcentage = self._pourcentage
-        dim = self.map_lenght_in_square
+        dim_t = self.map_lenght_in_square
 
         # resize image
+        dim = (dim_t[1],dim_t[0])
         resized_frame = cv2.resize(frame, dim, interpolation = cv2.INTER_AREA)
         
         print('Resized Dimensions : ',resized_frame.shape)
         
-        cv2.imshow("rezize mask", resized_frame)
-        
+        #cv2.imshow("rezize mask", resized_frame)
+        cv2.imwrite("rezize.jpg", resized_frame)
         
     
         secured_frame = self.security_grid_expand(resized_frame)
+        #cv2.imshow("secured", secured_frame)
+        cv2.imwrite("secured.jpg", secured_frame)
         
         self._grid = secured_frame
-        self._pourcentage = pourcentage
         
         self._grid_init = True
         
