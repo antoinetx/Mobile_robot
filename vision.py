@@ -200,7 +200,7 @@ def setup_robot_pose(red_contours, red_points):
 def update(frame, factor_reduc):
             
     
-    red_points, red_mask, red_contours = detect_inrange(frame, 50, red)
+    red_points, red_mask, red_contours = detect_inrange(frame, 400, red)
     
     #display the vector and points
     put_center_circle(frame,red_contours, red_points, ROUGE)
@@ -236,11 +236,11 @@ def display (frame, bool_bl, bool_gr, bool_red):
     
     if bool_bl:
         bl_points, bl_mask, bl_contours = detect_inrange(frame, 1000, blue)
-        put_center_circle(frame,bl_contours, bl_points, ROUGE)
+        put_center_circle(frame,bl_contours, bl_points, GREEN)
         
     if bool_gr:
         gr_points, gr_mask, gr_contours = detect_inrange(frame, 1000, green)
-        put_center_circle(frame,gr_contours, gr_points, ROUGE)
+        put_center_circle(frame,gr_contours, gr_points, GREEN)
         
     if bool_red:
         red_points, red_mask, red_contours = detect_inrange(frame, 50, red)
