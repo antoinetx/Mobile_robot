@@ -4,22 +4,20 @@ from asgiref.sync import sync_to_async
 import tdmclient
 import matplotlib.pyplot as plt
 import numpy as np
-from random import random
+import numpy.linalg as LA
 
 
-test_functions = True
 # ## Move from point A to point B
 
 # simulation parameters 
 KP_dist = 2
-KP_alpha = 40
-dt = 0.01
+KP_alpha = 70
 BASICSPEED = 100
 GAIN = 10
 MAX_SPEED = 200
-th_dist = 10
+th_dist = 40
 
-@tdmclient.notebook.sync_var
+#@tdmclient.notebook.sync_var
 def compute_distance(x_goal, y_goal, x, y):
     x_diff = x_goal - x
     y_diff = y_goal - y
@@ -27,7 +25,8 @@ def compute_distance(x_goal, y_goal, x, y):
     
     return dist
 
-@tdmclient.notebook.sync_var
+
+#@tdmclient.notebook.sync_var
 def move_to_position(x_robot, y_robot, angle_robot, x_goal, y_goal):
     """
     dist is the distance between the robot and the goal position
@@ -43,23 +42,23 @@ def move_to_position(x_robot, y_robot, angle_robot, x_goal, y_goal):
     dist_center = compute_distance(x_goal, y_goal, x_robot, y_robot)
     print('dist_debut',dist_center)
 
-
     # definition of angle alpha
-    x_diff = x_goal - x_robot
-    y_diff = y_goal - y_robot
-    alpha = ( np.arctan2(y_diff, x_diff) - angle_robot +np.pi) % (2*np.pi) - np.pi
-
+    angle_goal = np.arccos (1/dist_center)
+    print('angle_goal,', angle_goal)
+    alpha = abs(angle_goal - angle_robot)   # erreur d'angle à corriger avec le PD
+    print('alpha', alpha)
     # speed update
     v = KP_dist * dist_center
     print('v', v)
     w = KP_alpha * alpha
     print('w', w)
 
-    if alpha > np.pi/18 :
+    if alpha > np.pi/18 or alpha < -np.pi/18:
         v = 0
-
+    print('v2', v)
     speed_r = int(v - w)
     speed_l = int(v + w)
+    print('speed_original,' , speed_l, speed_r)
     if speed_r > MAX_SPEED :
         speed_r = MAX_SPEED
     if speed_l > MAX_SPEED:
@@ -72,4 +71,5 @@ def move_to_position(x_robot, y_robot, angle_robot, x_goal, y_goal):
     return speed_l, speed_r 
 
 
+move_to_position(4.7 , 23, 1.43, 40,40)
 
