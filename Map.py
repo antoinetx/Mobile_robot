@@ -23,6 +23,13 @@ class Map :
             return self._grid
         else:
             print("No grid yet. Please init the grid")
+            
+
+    def set_pourcentage(self, frame):
+        self._pourcentage = (self._wanted_nb_square_by_side/frame.shape[0])
+        
+    def get_pourcentage(self):
+        return self._pourcentage
 
     #def update_map(self, new_grid):
     #    self._grid = new_grid
@@ -30,8 +37,7 @@ class Map :
     #def get_lenght(self):
         #return self._nb_square_by_side
         
-    def get_pourcentage(self):
-        return self._pourcentage
+    
     
     def security_grid_expand(self, frame, robot_len = 0.10, security_margin = 0.03):
         """
@@ -61,7 +67,7 @@ class Map :
     
     def init_grid(self, frame):
         
-        pourcentage = (self._wanted_nb_square_by_side/frame.shape[0])
+        pourcentage = self._pourcentage
 
         width = int(frame.shape[1] * pourcentage )
         height = int(frame.shape[0] * pourcentage )
