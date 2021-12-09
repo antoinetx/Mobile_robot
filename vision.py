@@ -24,7 +24,8 @@ reduction = 10
 x_max = int(480)
 y_max = int(640)
 
-blue = 120
+#blue = 120
+blue = 100
 green = 60
 sensitivity = 20
 
@@ -65,18 +66,19 @@ def put_center_circle(image, contours,points,color):
         for i in points:
             cv2.circle(image, (i[0], i[1]), 7, color, -1)
             
-def vision_initialization():
-    
-    VideoCap=cv2.VideoCapture(0)
-    print('Hello World')
-    ret, frame=VideoCap.read()
+def init_goal(frame):
     
     
     gr_points,  gr_mask, gr_contours=detect_inrange(frame, 10000, green)
-    goal.x = gr_points[0][0]
-    goal.y =480 -gr_points[0][1]
     
-    return VideoCap
+    if (len(gr_points)>0):
+        goal.x = gr_points[0][0]
+        goal.y =480 - gr_points[0][1]
+    else:
+        print('No parking slot free')
+        
+    return 
+
     
 def vision_end(VideoCap):
     VideoCap.release()
@@ -146,7 +148,8 @@ def get_pose():
 
   
 def get_goal(factor_reduc):
-    return goal.x*factor_reduc, goal.y*factor_reduc
+    goal_vect = (goal.x*factor_reduc, goal.y*factor_reduc)
+    return goal_vect
 
 def angle_of_vectors(a,b,c,d):
        
@@ -202,10 +205,9 @@ def setup_robot_pose(red_contours, red_points):
     #print('l angle')
     #print(angle)
     
-def update(VideoCap, factor_reduc, kalman_bool):
+def update(frame, factor_reduc, kalman_bool):
+    
     stop_video = False
-    ret, frame=VideoCap.read()
-        
             
     red_points, red_mask, red_contours = detect_inrange(frame, 300, red)
     
@@ -235,16 +237,18 @@ def update(VideoCap, factor_reduc, kalman_bool):
         
     cv2.imshow('image', frame)
     
+    """
     if cv2.waitKey(1)&0xFF==ord('q'):
         print('le bouton quitter')
         
         vision_end(VideoCap)
         stop_video =True  
+    """
         
     if kalman_bool == False:
-        return  pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc, pose_robot_1.angle, stop_video
+        return  (pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc), pose_robot_1.angle
     else:
-        return int(etat[0]) * factor_reduc, int(etat[1])*factor_reduc, pose_robot_1.angle, stop_video
+        return (int(etat[0]) * factor_reduc, int(etat[1])*factor_reduc), pose_robot_1.angle
         
 
 

@@ -15,6 +15,7 @@ class Map :
         self._wanted_nb_square_by_side = wanted_nb_square_per_side
         self._grid_init = False
         self._square_size_m = 0.1
+        self._pourcentage = 1
     
 
     def get_map(self):
@@ -28,6 +29,9 @@ class Map :
 
     #def get_lenght(self):
         #return self._nb_square_by_side
+        
+    def get_pourcentage(self):
+        return self._pourcentage
     
     def security_grid_expand(self, frame, robot_len = 0.10, security_margin = 0.03):
         """
@@ -75,6 +79,7 @@ class Map :
         secured_frame = self.security_grid_expand(resized_frame)
         
         self._grid = secured_frame
+        self._pourcentage = pourcentage
         
         self._grid_init = True
         
