@@ -128,7 +128,9 @@ def angle_of_vectors(a,b,c,d):
 def init_goal(frame, factor_reduc):
     
     goal_vect = (0, 0)
-    gr_points,  gr_mask, gr_contours=detect_inrange(frame, 10000, green)
+    gr_points,  gr_mask, gr_contours=detect_inrange(frame, 1000, green)
+    print(' la position goal')
+    print(gr_points)
     
     if (len(gr_points)>0):
         goal.x = gr_points[0][0]
@@ -137,6 +139,7 @@ def init_goal(frame, factor_reduc):
         print('No parking slot free')
         
     goal_vect = (goal.x*factor_reduc, goal.y*factor_reduc)
+    
     
     return goal_vect
 
@@ -158,7 +161,7 @@ def mask_map_init(VideoCap):
 
 def setup_robot_pose(red_contours, red_points):
     if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
-        #print('if')
+        print('if')
         #calcul position
         pose_robot_1.x = red_points[0][0]
         pose_robot_1.y =480 - red_points[0][1]
@@ -172,7 +175,7 @@ def setup_robot_pose(red_contours, red_points):
         #print(red_points[1][0])
         #print(pose_robot_2.x)
     else:
-        #print('else')
+        print('else')
         #calcul position
         pose_robot_1.x = red_points[0][0]
         pose_robot_1.y = 480 - red_points[0][1]
@@ -197,7 +200,7 @@ def setup_robot_pose(red_contours, red_points):
 def update(frame, factor_reduc):
             
     
-    red_points, red_mask, red_contours = detect_inrange(frame, 800, red)
+    red_points, red_mask, red_contours = detect_inrange(frame, 50, red)
     
     #display the vector and points
     put_center_circle(frame,red_contours, red_points, ROUGE)
@@ -220,7 +223,7 @@ def update(frame, factor_reduc):
         #KF.update(np.expand_dims(red_points[0],axis=-1))
         
     if(len(red_points)>1):
-        #print('robot detected')
+        print('robot detected')
         setup_robot_pose(red_contours, red_points)
             
     
