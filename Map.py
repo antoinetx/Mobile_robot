@@ -16,6 +16,7 @@ class Map :
         self._grid_init = False
         self._square_size_m = 0.1
         self._pourcentage = 1
+        self.map_lenght_in_square = (0,0)
     
 
     def get_map(self):
@@ -25,8 +26,13 @@ class Map :
             print("No grid yet. Please init the grid")
             
 
-    def set_pourcentage(self, frame):
-        self._pourcentage = (self._wanted_nb_square_by_side/frame.shape[0])
+    def set_map_lenght(self, frame):
+        
+        pourcentage = (self._wanted_nb_square_by_side/max(frame.shape))
+        width = int(frame.shape[0] * pourcentage )
+        height = int(frame.shape[1] * pourcentage )
+        self.map_lenght_in_square = (width,height)
+        self._pourcentage = pourcentage
         
     def get_pourcentage(self):
         return self._pourcentage
@@ -34,8 +40,8 @@ class Map :
     #def update_map(self, new_grid):
     #    self._grid = new_grid
 
-    #def get_lenght(self):
-        #return self._nb_square_by_side
+    def get_lenght(self):
+        return self.map_lenght_in_square
         
     
     
@@ -68,10 +74,7 @@ class Map :
     def init_grid(self, frame):
         
         pourcentage = self._pourcentage
-
-        width = int(frame.shape[1] * pourcentage )
-        height = int(frame.shape[0] * pourcentage )
-        dim = (width, height)
+        dim = self.map_lenght_in_square
 
         # resize image
         resized_frame = cv2.resize(frame, dim, interpolation = cv2.INTER_AREA)

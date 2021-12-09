@@ -18,7 +18,7 @@ from Map import Map
 
 # Display functions
 
-def create_empty_plot(max_val):
+def create_empty_plot(lenght):
     """
     Helper function to create a figure of the desired dimensions & grid
     
@@ -27,26 +27,27 @@ def create_empty_plot(max_val):
     """
     fig, ax = plt.subplots(figsize=(7,7))
     
-    major_ticks_x = np.arange(0, max_val+10+1, 5)
-    minor_ticks_x = np.arange(0, max_val+10+1, 1)
+    major_ticks_x = np.arange(0, lenght[0]+1, 5)
+    minor_ticks_x = np.arange(0, lenght[0]+1, 1)
     ax.set_xticks(major_ticks_x)
     ax.set_xticks(minor_ticks_x, minor=True)
-    major_ticks = np.arange(0, max_val+1, 5)
-    minor_ticks = np.arange(0, max_val+1, 1)
+    major_ticks = np.arange(0, lenght[1]+1, 5)
+    minor_ticks = np.arange(0, lenght[1]+1, 1)
     ax.set_yticks(major_ticks)
     ax.set_yticks(minor_ticks, minor=True)
     #ax.grid(which='minor', alpha=0.2)
     #ax.grid(which='major', alpha=0.5)
-    ax.set_ylim([-1,max_val])
-    ax.set_xlim([-1,max_val + 10])
+    ax.set_ylim([-1,lenght[1]])
+    ax.set_xlim([-1,lenght[0]])
     ax.grid(True)
     
     return fig, ax
 
-def display_map(max_val , occupancy_grid , visitedNodes ,  path , start, goal):
+def display_map(lenght , occupancy_grid , visitedNodes ,  path , start, goal):
     cmap = colors.ListedColormap(['white', 'red']) # Select the colors with which to display obstacles and free cells
     # Displaying the map
-    fig_astar, ax_astar = create_empty_plot(max_val)
+    print("LENNNN", lenght)
+    fig_astar, ax_astar = create_empty_plot(lenght)
     ax_astar.imshow(occupancy_grid.transpose(), cmap=cmap)
 
 
@@ -102,7 +103,7 @@ def reconstruct_path(cameFrom, current):
         current=cameFrom[current]
     return total_path
 
-def A_Star(start, goal, h, coords, occupancy_grid, max_val, movement_type="4N"):
+def A_Star(start, goal, h, coords, occupancy_grid, lenght, movement_type="4N"):
     """
     A* for 2D occupancy grid. Finds a path from start to goal.
     h is the heuristic function. h(n) estimates the cost to reach goal from node n.
@@ -118,9 +119,26 @@ def A_Star(start, goal, h, coords, occupancy_grid, max_val, movement_type="4N"):
     # -----------------------------------------
     
     # Check if the start and goal are within the boundaries of the map
-    for point in [start, goal]:
-        for coord in point:
-            assert coord>=0 and coord<max_val+10, "start or end goal not contained in the map"
+    
+    print("start_x",start[0])
+    print("start_x",start[1])
+    print("goal_y",goal[0])
+    print("goal_y",goal[1])
+    print("lenght_x",lenght[0])
+    print("lenght_y",lenght[1])
+    
+    print("test ifeee")
+    
+    if ((0 < start[0] <= lenght[0]) &  (0 < start[1] <= lenght[1])):
+        print("C'est bon")
+        
+    
+    assert  0 <= start[0] <= lenght[0] and  0 <= start[1] <= lenght[1], "start not contained in the map"
+    assert 0 <= goal[0] <= goal[0] and  0 <= goal[1] <= goal[1], "goal not contained in the map"
+    
+    #for point in [start, goal]:
+    #    for coord in point:
+    #        assert coord>=0 and coord< max(lenght), "start or end goal not contained in the map"
     
     # check if start and goal nodes correspond to free spaces
     if occupancy_grid[start[0], start[1]]:
@@ -208,8 +226,8 @@ def A_Star(start, goal, h, coords, occupancy_grid, max_val, movement_type="4N"):
 #######################################
 # PATH COMPUTATION AND UPDATE 
 #######################################
-def path_computation(start , goal , max_val, occupancy_grid):
-    x,y = np.mgrid[0:max_val:1, 0:max_val+10:1]
+def path_computation(start , goal , lenght, occupancy_grid):
+    x,y = np.mgrid[0:lenght[0]:1, 0:lenght[1]:1]
     print("youhouuuuu")
     print(x.shape)
     print(y.shape)
@@ -223,7 +241,7 @@ def path_computation(start , goal , max_val, occupancy_grid):
     h = dict(zip(coords, h))
 
     # Run the A* algorithm
-    path, visitedNodes = A_Star(start, goal, h, coords, occupancy_grid, max_val, movement_type="8N")
+    path, visitedNodes = A_Star(start, goal, h, coords, occupancy_grid, lenght, movement_type="8N")
 
     path = np.array(path).reshape(-1, 2).transpose()
     print(len(visitedNodes))
