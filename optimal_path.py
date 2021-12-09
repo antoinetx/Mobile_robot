@@ -27,16 +27,18 @@ def create_empty_plot(max_val):
     """
     fig, ax = plt.subplots(figsize=(7,7))
     
+    major_ticks_x = np.arange(0, max_val+10+1, 5)
+    minor_ticks_x = np.arange(0, max_val+10+1, 1)
+    ax.set_xticks(major_ticks_x)
+    ax.set_xticks(minor_ticks_x, minor=True)
     major_ticks = np.arange(0, max_val+1, 5)
     minor_ticks = np.arange(0, max_val+1, 1)
-    ax.set_xticks(major_ticks)
-    ax.set_xticks(minor_ticks, minor=True)
     ax.set_yticks(major_ticks)
     ax.set_yticks(minor_ticks, minor=True)
     #ax.grid(which='minor', alpha=0.2)
     #ax.grid(which='major', alpha=0.5)
     ax.set_ylim([-1,max_val])
-    ax.set_xlim([-1,max_val])
+    ax.set_xlim([-1,max_val + 10])
     ax.grid(True)
     
     return fig, ax
@@ -118,7 +120,7 @@ def A_Star(start, goal, h, coords, occupancy_grid, max_val, movement_type="4N"):
     # Check if the start and goal are within the boundaries of the map
     for point in [start, goal]:
         for coord in point:
-            assert coord>=0 and coord<max_val, "start or end goal not contained in the map"
+            assert coord>=0 and coord<max_val+10, "start or end goal not contained in the map"
     
     # check if start and goal nodes correspond to free spaces
     if occupancy_grid[start[0], start[1]]:
@@ -207,7 +209,10 @@ def A_Star(start, goal, h, coords, occupancy_grid, max_val, movement_type="4N"):
 # PATH COMPUTATION AND UPDATE 
 #######################################
 def path_computation(start , goal , max_val, occupancy_grid):
-    x,y = np.mgrid[0:max_val:1, 0:max_val:1]
+    x,y = np.mgrid[0:max_val:1, 0:max_val+10:1]
+    print("youhouuuuu")
+    print(x.shape)
+    print(y.shape)
     pos = np.empty(x.shape + (2,))
     pos[:, :, 0] = x; pos[:, :, 1] = y
     pos = np.reshape(pos, (x.shape[0]*x.shape[1], 2))

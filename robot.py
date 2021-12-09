@@ -10,8 +10,8 @@ class Robot :
             self.path = np.empty
             self.visit_node = np.empty
             self.current_path_index = 0
-            self.start_pos = (0,0)
-            self.pos = (0,0)
+            self.start_pos = (-1,-1)
+            self.pos = (-1,-1)
             self.goal = (0,0)
             self.angle = 0 # angle with y
             self.pos_err = 2 # Square error for position
