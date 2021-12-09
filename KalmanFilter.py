@@ -44,3 +44,7 @@ class KalmanFilter(object):
         self.P=(I-(K*self.H))*self.P
 
         return self.E
+    
+    def kalman_udpate(KF,position,speed):
+        etat=KF.predict().astype(np.int32)
+        KF.update(np.expand_dims(position,axis=-1))

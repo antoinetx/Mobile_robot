@@ -39,8 +39,8 @@ class Position:
 
 
 # ---- variable grobale
-KF=KalmanFilter(0.1, [0, 0])
-stop_video = False
+#KF=KalmanFilter(0.1, [0, 0])
+
 
 
 pose_robot_1 = Pose
@@ -151,9 +151,7 @@ def mask_map_init(VideoCap):
     
     bl_points, bl_mask, bl_contours=detect_inrange(frame, 10000, blue)
     
-    if (len(bl_points)>0):
-        for i in bl_points:
-            cv2.circle(frame, (i[0], i[1]), 7, (0, 0, 255), -1)
+    
     return bl_mask
     
 
@@ -217,21 +215,17 @@ def update(frame, factor_reduc):
     #etat=KF.predict().astype(np.int32)
     
     # calculate the position
-    if(len(red_points)>0):
-        cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, (0,255,0), 5)
+    #if(len(red_points)>0):
+        #cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, (0,255,0), 5)
         #KF.update(np.expand_dims(red_points[0],axis=-1))
         
-        if(len(red_points)>1):
-            #print('robot detected')
-            setup_robot_pose(red_contours, red_points)
+    if(len(red_points)>1):
+        #print('robot detected')
+        setup_robot_pose(red_contours, red_points)
             
     
+    return  (pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc), pose_robot_1.angle
     
-        
-    #if kalman_bool == False:
-        return  (pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc), pose_robot_1.angle, stop_video
-    #else:
-    #    return int(etat[0]) * factor_reduc, int(etat[1])*factor_reduc, pose_robot_1.angle, stop_video
     
     
     
