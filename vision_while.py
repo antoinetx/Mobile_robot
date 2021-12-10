@@ -203,15 +203,72 @@ def setup_robot_pose(red_contours, red_points):
     #print('l angle')
     #print(angle)
     
-def update(VideoCap, factor_reduc, kalman_bool):
-    stop_video = False
-    ret, frame=VideoCap.read()
-        
-            
-    red_points, red_mask, red_contours = detect_inrange(frame, 50, red)
+def sorting_contour(points, elements):
     
-    put_center_circle(frame,red_contours, red_points, ROUGE)
+    print('sort')
+    
+    if(len(points)>1):
+        point_1 = []
+        point_2 = []
+        surface_1 = 0
+        surface_2 = 0
+        #if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
+        i = 0
+        for element in elements:
+            if cv2.contourArea(element)>surface_2:
+                surface_2 = cv2.contourArea(element)
+                point_2 =  points[i]
+                if surface_2 > surface_1:
+                    surface_inter = surface_1
+                    surface_1 = surface_2
+                    surface_2 = surface_inter
+                    
+                    point_inter = point_1
+                    point_1 = point_2
+                    point_2 = point_inter
+                
+                
+            
+            i += 1
+    else:
+        point_1 = []
+        point_2 = []
+        surface_1 = 0
+        surface_2 = 0
         
+    
+    return point_1, point_2, surface_1, surface_2
+    
+    
+def update(frame, factor_reduc, kalman_bool):    
+               
+    red_points, red_mask, red_contours = detect_inrange(frame, 400, red) 
+    
+    if(len(red_points)>1):
+        cnt = sorted(red_contours, key=cv2.contourArea, reverse=True)
+    
+        ((x, y), rayon)=cv2.minEnclosingCircle(cnt[0])
+        red_points[0][0] = x
+        red_points[0][1] = y
+
+        ((x, y), rayon)=cv2.minEnclosingCircle(cnt[1])
+        red_points[1][0] = x
+        red_points[1][1] = y
+        
+        cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, BLEU, 5)
+        put_center_circle(frame,red_contours, red_points, ROUGE)
+        setup_robot_pose(red_contours, red_points)
+        
+    #get the points of the robot
+    if(len(red_points)>1):
+        cv2.arrowedLine(frame,
+                    (int(red_points[0][0]), int(red_points[0][1])), (int(red_points[1][0]), int(red_points[1][1])),
+                    color=(0, 255, 0),
+                    thickness=3,
+                    tipLength=0.2)
+
+    cv2.imshow('image', frame)
+    
     #get the points of the robot
     if(len(red_points)>1):
         cv2.arrowedLine(frame,
@@ -222,18 +279,14 @@ def update(VideoCap, factor_reduc, kalman_bool):
         #print('arrowed')
         
     etat=KF.predict().astype(np.int32)
-    
-    
+      
     if(len(red_points)>0):
-        cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, (0,255,0), 5)
-        KF.update(np.expand_dims(red_points[0],axis=-1))
-        
+    
         if(len(red_points)>1):
             #print('robot detected')
             setup_robot_pose(red_contours, red_points)
             # show a vector for the orientation
-            
-        
+                  
    # cv2.imshow('image', frame)
     
     if cv2.waitKey(1)&0xFF==ord('q'):
@@ -242,12 +295,8 @@ def update(VideoCap, factor_reduc, kalman_bool):
         vision_end(VideoCap)
         stop_video =True  
         
-    if kalman_bool == False:
-        return  pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc, pose_robot_1.angle, stop_video
-    else:
-        return int(etat[0]) * factor_reduc, int(etat[1])*factor_reduc, pose_robot_1.angle, stop_video
-        
-
+    
+    return  pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc, pose_robot_1.angle, stop_video
 
 # ---- MAIN ----
 
@@ -256,76 +305,32 @@ VideoCap=cv2.VideoCapture(0)
 KF=KalmanFilter(0.1, [0, 0])
 
 
-
-
-
 while(True):
     ret, frame=VideoCap.read()
     
-    gr_points, gr_mask = vision_initialization(frame)
+    #gr_points, gr_mask = vision_initialization(frame)
     
-    mask_map_init(VideoCap)
-
+    update(frame, 1, 0)
+    
+    #bl_points, bl_mask, bl_contours = detect_inrange(frame, 1000, blue)
+    #gr_points, gr_mask, gr_contours = detect_inrange(frame, 1000, green)
+    
+    #put_center_circle(frame,bl_contours, bl_points, ROUGE)
+    #put_center_circle(frame,gr_contours, gr_points, ROUGE)
+    
+    #image, cnts, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    #cnt = sorted(red_contours, key=cv2.contourArea)
+    
    
-    #points, mask=detect_visage(frame)
     
-    #update(VideoCap, 1, 0)
-   
-    
-    bl_points, bl_mask, bl_contours = detect_inrange(frame, 1000, blue)
-    gr_points, gr_mask, gr_contours = detect_inrange(frame, 1000, green)
-    
-    
-    put_center_circle(frame,bl_contours, bl_points, ROUGE)
-    put_center_circle(frame,gr_contours, gr_points, ROUGE)
-    
-    red_points, red_mask, red_contours = detect_inrange(frame, 50, red)
-    
-    put_center_circle(frame,red_contours, red_points, ROUGE)
-        
-    #get the points of the robot
-    if(len(red_points)>1):
-        cv2.arrowedLine(frame,
-                    (int(red_points[0][0]), int(red_points[0][1])), (int(red_points[1][0]), int(red_points[1][1])),
-                    color=(0, 255, 0),
-                    thickness=3,
-                    tipLength=0.2)
-        #print('arrowed')
-    cv2.imshow('image', frame)
-    if bl_mask is not None:
-            cv2.imshow('blue mask', bl_mask)
-            if gr_mask is not None:
-                cv2.imshow('green mask', gr_mask)
-    
-    
-    
-    if (len(gr_points)>0):
-        for i in gr_points:
-            cv2.circle(frame, (i[0], i[1]), 7, (0, 0, 255), -1)
-            
+    #if (len(gr_points)>0):
+    #    for i in gr_points:
+    #        cv2.circle(frame, (i[0], i[1]), 7, (0, 0, 255), -1)
+          
     if cv2.waitKey(1)&0xFF==ord('q'):
-        print('le bouton quitter')
-        
+        print('le bouton quitter')        
         vision_end(VideoCap)
-        stop_video =True  
-    
-    
-
-    
-
-    #cv2.circle(frame, (int(etat[0]), int(etat[1])), 2, (0, 255, 0), 5)
-    #cv2.arrowedLine(frame,
-     #               (etat[0], etat[1]), (etat[0]+etat[2], etat[1]+etat[3]),
-    #              color=(0, 255, 0),
-    #                thickness=3,
-    #                tipLength=0.2)
-    
-    
-
-  
-
-
-
+        break 
 
 #VideoCap=cv2.VideoCapture(0)
 
@@ -335,8 +340,4 @@ while(True):
 
 #while(True):
     
-
-
-     
-
-        
+# https://stackoverflow.com/questions/32669415/opencv-ordering-a-contours-by-area-python       
