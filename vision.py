@@ -129,8 +129,8 @@ def init_goal(frame, factor_reduc):
     
     goal_vect = (0, 0)
     gr_points,  gr_mask, gr_contours=detect_inrange(frame, 1000, green)
-    print(' la position goal')
-    print(gr_points)
+    #print(' la position goal')
+    #print(gr_points)
     
     
     if (len(gr_points)>0):
@@ -161,7 +161,7 @@ def mask_map_init(frame):
 
 def setup_robot_pose(red_contours, red_points, size_frame):
     if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
-        print('if')
+        #print('if')
         #calcul position
         pose_robot_1.x = red_points[0][0]
         pose_robot_1.y = size_frame - red_points[0][1]
@@ -175,7 +175,7 @@ def setup_robot_pose(red_contours, red_points, size_frame):
         #print(red_points[1][0])
         #print(pose_robot_2.x)
     else:
-        print('else')
+        #print('else')
         #calcul position
         pose_robot_1.x = red_points[1][0]
         pose_robot_1.y = size_frame - red_points[1][1]
@@ -223,7 +223,7 @@ def update(frame, factor_reduc):
         #KF.update(np.expand_dims(red_points[0],axis=-1))
         
     if(len(red_points)>1):
-        print('robot detected')
+        #print('robot detected')
         setup_robot_pose(red_contours, red_points, size_frame)
             
     
@@ -232,7 +232,7 @@ def update(frame, factor_reduc):
     
     
     
-def display (frame, bool_bl, bool_gr, bool_red, bool_path, path_array, factor_reduc):
+def display (frame, bool_bl, bool_gr, bool_red, bool_path, path, factor_reduc):
     
     if bool_bl:
         bl_points, bl_mask, bl_contours = detect_inrange(frame, 1000, blue)
@@ -253,17 +253,13 @@ def display (frame, bool_bl, bool_gr, bool_red, bool_path, path_array, factor_re
                     tipLength=0.2)
         #print('arrowed')
         
+    
     if bool_path:
-        path_array = np.transpose(path_array)
-        if (len(path_array)>0):
-            print('affichage du path')
-            print("SHAPE du PATH", path_array.shape)
-            for point in path_array:
-                print(point)
-                point[0] = int(point[0]/factor_reduc)
-                point[1] = int(point[1]/factor_reduc)
-                cv2.circle(frame, (point[0], frame.shape[0]-point[1]), 7, BLEU, -1)
-
+        path_ar = np.transpose(path)
+        if (len(path_ar)>0):
+            for point in path_ar:
+                cv2.circle(frame, (int(point[0]/factor_reduc), frame.shape[0] - int(point[1]/factor_reduc)), 7, BLEU, -1)
+              
     
     cv2.imshow('image', frame)
     

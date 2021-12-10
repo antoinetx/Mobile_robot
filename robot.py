@@ -55,6 +55,11 @@ class Robot :
     
     def get_current(self):
         return self.current_path_index
+    
+    def set_current(self, value):
+        self.current_path_index = value
+    
+    
 
 
 
