@@ -46,7 +46,7 @@ def create_empty_plot(lenght):
 def display_map(lenght , occupancy_grid , visitedNodes ,  path , start, goal):
     cmap = colors.ListedColormap(['white', 'red']) # Select the colors with which to display obstacles and free cells
     # Displaying the map
-    print("LENNNN", lenght)
+    #print("LENNNN", lenght)
     fig_astar, ax_astar = create_empty_plot(lenght)
     ax_astar.imshow(occupancy_grid.transpose(), cmap=cmap)
 
@@ -119,19 +119,6 @@ def A_Star(start, goal, h, coords, occupancy_grid, lenght, movement_type="4N"):
     # -----------------------------------------
     
     # Check if the start and goal are within the boundaries of the map
-    
-    print("start_x",start[0])
-    print("start_x",start[1])
-    print("goal_y",goal[0])
-    print("goal_y",goal[1])
-    print("lenght_x",lenght[0])
-    print("lenght_y",lenght[1])
-    
-    print("test ifeee")
-    
-    if ((0 < start[0] <= lenght[0]) &  (0 < start[1] <= lenght[1])):
-        print("C'est bon")
-        
     
     assert  0 <= start[0] <= lenght[0] and  0 <= start[1] <= lenght[1], "start not contained in the map"
     assert 0 <= goal[0] <= goal[0] and  0 <= goal[1] <= goal[1], "goal not contained in the map"
@@ -228,9 +215,6 @@ def A_Star(start, goal, h, coords, occupancy_grid, lenght, movement_type="4N"):
 #######################################
 def path_computation(start , goal , lenght, occupancy_grid):
     x,y = np.mgrid[0:lenght[0]:1, 0:lenght[1]:1]
-    print("youhouuuuu")
-    print(x.shape)
-    print(y.shape)
     pos = np.empty(x.shape + (2,))
     pos[:, :, 0] = x; pos[:, :, 1] = y
     pos = np.reshape(pos, (x.shape[0]*x.shape[1], 2))

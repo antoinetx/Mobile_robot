@@ -14,7 +14,7 @@ class Map :
         self._lenght_m = lenght_in_m #lenght of the smallest size
         self._wanted_nb_square_by_side = wanted_nb_square_per_side
         self._grid_init = False
-        self._square_size_m = 0.1
+        self._square_size_m = lenght_in_m / wanted_nb_square_per_side
         self._pourcentage = 1
         self.map_lenght_in_square = (0,0)
     
@@ -33,6 +33,7 @@ class Map :
         height = int(frame.shape[0] * pourcentage )  
         self.map_lenght_in_square = (width,height)
         self._pourcentage = pourcentage
+
         
     def get_pourcentage(self):
         return self._pourcentage
@@ -45,7 +46,7 @@ class Map :
         
     
     
-    def security_grid_expand(self, frame, robot_len = 0.10, security_margin = 0.03):
+    def security_grid_expand(self, frame, robot_len = 0.05, security_margin = 0.01):
         """
         Expand the grid to avoid the robot colyding whit an obstacle
         :param frame: the video frame 
@@ -60,12 +61,12 @@ class Map :
         len_j = len(frame[0])
         
         new_frame = np.zeros((len_i,len_j))
-
+        
         for i in range(len_i):
             if sum(frame[i,:] != 0): # this if allow to avoid the second loop if there is no obstacle on this line
                 for j in range(len_j):
                     if frame[i][j] > 50:
-                        new_frame[(i-sec_square):(i+sec_square),(j-sec_square):(j+sec_square)] = 1
+                        new_frame[(i-sec_square):(i+sec_square),(j-sec_square):(j+sec_square)] = 255
 
         self._grid = new_frame # Save the new grid in the object
         return new_frame

@@ -159,31 +159,31 @@ def mask_map_init(frame):
     
 
 
-def setup_robot_pose(red_contours, red_points):
+def setup_robot_pose(red_contours, red_points, size_frame):
     if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
         print('if')
         #calcul position
         pose_robot_1.x = red_points[0][0]
-        pose_robot_1.y =480 - red_points[0][1]
+        pose_robot_1.y = size_frame - red_points[0][1]
         #print('x y du robot')
         #print(pose_robot_1.x)
         #print(pose_robot_1.y)
         
         #calcul vecteur
         pose_robot_2.x = red_points[1][0]
-        pose_robot_2.y =480 -  red_points[1][1]
+        pose_robot_2.y = size_frame -  red_points[1][1]
         #print(red_points[1][0])
         #print(pose_robot_2.x)
     else:
         print('else')
         #calcul position
         pose_robot_1.x = red_points[1][0]
-        pose_robot_1.y = 480 - red_points[1][1]
+        pose_robot_1.y = size_frame - red_points[1][1]
         #print(red_points[0][0])
         
         #calcul vecteur
         pose_robot_2.x = red_points[0][0]
-        pose_robot_2.y = 480 - red_points[0][1]
+        pose_robot_2.y = size_frame - red_points[0][1]
         #print('x y du robot')
         #print(pose_robot_1.x)
         #print(pose_robot_1.y)
@@ -199,7 +199,7 @@ def setup_robot_pose(red_contours, red_points):
     
 def update(frame, factor_reduc):
             
-    
+    size_frame = frame.shape[0]
     red_points, red_mask, red_contours = detect_inrange(frame, 400, red)
     
     #display the vector and points
@@ -224,7 +224,7 @@ def update(frame, factor_reduc):
         
     if(len(red_points)>1):
         print('robot detected')
-        setup_robot_pose(red_contours, red_points)
+        setup_robot_pose(red_contours, red_points, size_frame)
             
     
     return  (int(pose_robot_1.x * factor_reduc), int(pose_robot_1.y*factor_reduc)), pose_robot_1.angle
@@ -254,13 +254,16 @@ def display (frame, bool_bl, bool_gr, bool_red, bool_path, path_array, factor_re
         #print('arrowed')
         
     if bool_path:
+        path_array = np.transpose(path_array)
         if (len(path_array)>0):
             print('affichage du path')
+            print("SHAPE du PATH", path_array.shape)
             for point in path_array:
-                point[0] = int(point/factor_reduc)
-                point[1] = int(point/factor_reduc)
-                cv2.circle(frame, (point[0], point[1]), 7, BLEU, -1)
-        
+                print(point)
+                point[0] = int(point[0]/factor_reduc)
+                point[1] = int(point[1]/factor_reduc)
+                cv2.circle(frame, (point[0], frame.shape[0]-point[1]), 7, BLEU, -1)
+
     
     cv2.imshow('image', frame)
     
