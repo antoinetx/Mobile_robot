@@ -232,7 +232,7 @@ def update(frame, factor_reduc):
     
     
     
-def display (frame, bool_bl, bool_gr, bool_red):
+def display (frame, bool_bl, bool_gr, bool_red, bool_path, path_array, factor_reduc):
     
     if bool_bl:
         bl_points, bl_mask, bl_contours = detect_inrange(frame, 1000, blue)
@@ -252,6 +252,15 @@ def display (frame, bool_bl, bool_gr, bool_red):
                     thickness=3,
                     tipLength=0.2)
         #print('arrowed')
+        
+    if bool_path:
+        if (len(path_array)>0):
+            print('affichage du path')
+            for point in path_array:
+                point[0] = int(point/factor_reduc)
+                point[1] = int(point/factor_reduc)
+                cv2.circle(frame, (point[0], point[1]), 7, BLEU, -1)
+        
     
     cv2.imshow('image', frame)
     
