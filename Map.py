@@ -17,6 +17,7 @@ class Map :
         self._square_size_m = lenght_in_m / wanted_nb_square_per_side
         self._pourcentage = 1
         self.map_lenght_in_square = (0,0)
+        self.pixel_to_m = 0
     
 
     def get_map(self):
@@ -33,6 +34,7 @@ class Map :
         height = int(frame.shape[0] * pourcentage )  
         self.map_lenght_in_square = (width,height)
         self._pourcentage = pourcentage
+        self.pixel_to_m = self._lenght_m/frame.shape[0]
 
         
     def get_pourcentage(self):
@@ -46,16 +48,17 @@ class Map :
         
     
     
-    def security_grid_expand(self, frame, robot_len = 0.05, security_margin = 0.01):
+    def security_grid_expand(self, frame, robot_len = 0.05, security_margin = 0.025):
         """
         Expand the grid to avoid the robot colyding whit an obstacle
         :param frame: the video frame 
         :save in map._grid: save the new expand grid
         :return: the new expand grid
         """
-        robot_lenght = robot_len # 10 cm
-        marge = security_margin # 3 cm de marge
-        sec_square = math.ceil((robot_lenght/2)/self._square_size_m) + math.ceil(marge/self._square_size_m)
+        robot_lenght = robot_len/self.pixel_to_m # 10 cm IN PIXEL
+        
+        marge = security_margin/self.pixel_to_m # 3 cm de marge
+        sec_square = math.ceil((robot_lenght/2)) + math.ceil(marge)
 
         len_i = len(frame)
         len_j = len(frame[0])
@@ -66,11 +69,10 @@ class Map :
             if sum(frame[i,:] != 0): # this if allow to avoid the second loop if there is no obstacle on this line
                 for j in range(len_j):
                     if frame[i][j] > 50:
-                        new_frame[(i-sec_square):(i+sec_square),(j-sec_square):(j+sec_square)] = 255
-
-        self._grid = new_frame # Save the new grid in the object
+                        new_frame[(i-sec_square):(i+1+sec_square),(j-sec_square):(j+1+sec_square)] = 255
         return new_frame
-    
+                            
+                        
     
     def init_grid(self, frame):
         
@@ -79,21 +81,26 @@ class Map :
         pourcentage = self._pourcentage
         dim_t = self.map_lenght_in_square
 
+
+        secured_frame = self.security_grid_expand(frame)
+        #cv2.imshow("secured", secured_frame)
+        cv2.imwrite("secured.jpg", secured_frame)
+        
         # resize image
         dim = (dim_t[1],dim_t[0])
-        resized_frame = cv2.resize(frame, dim, interpolation = cv2.INTER_AREA)
+        resized_frame = cv2.resize(secured_frame, dim, interpolation = cv2.INTER_AREA)
         
-        print('Resized Dimensions : ',resized_frame.shape)
+        #print('Resized Dimensions : ',resized_frame.shape)
         
         #cv2.imshow("rezize mask", resized_frame)
         cv2.imwrite("rezize.jpg", resized_frame)
         
-    
+        """
         secured_frame = self.security_grid_expand(resized_frame)
         #cv2.imshow("secured", secured_frame)
         cv2.imwrite("secured.jpg", secured_frame)
-        
-        self._grid = secured_frame
+        """
+        self._grid = resized_frame
         
         self._grid_init = True
         
