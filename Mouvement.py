@@ -71,7 +71,9 @@ def move_to_position(pos_robot , angle_robot, pos_goal, old_distance, old_angle)
     Kp_dist * dist and Kp_alpha * alpha drive the robot along a line towards the goal
 
     """
+    print ("movement")
     print (pos_robot)
+    print('old dist,' , old_distance, 'old angle', old_angle)
 
     x_robot, y_robot = pos_robot[0] , pos_robot[1]
     x_goal , y_goal = pos_goal[0] , pos_goal[1]
@@ -99,14 +101,18 @@ def move_to_position(pos_robot , angle_robot, pos_goal, old_distance, old_angle)
     w = PD (old_angle, alpha, KD_alpha, KP_alpha, dt)
     print('w', w)
 
-    """
-    if alpha > np.pi/18 or alpha < -np.pi/18:
-        v = 0
-    print('v2', v)
-    """
+    
+    print('new dist,' , dist_center, 'new angle', alpha)
+
 
     speed_r = int(BASICSPEED + v + w)
     speed_l = int(BASICSPEED + v - w)
+    if alpha > np.pi/18 or alpha < -np.pi/18:
+        speed_r = int( w)
+        speed_l = int(- w)
+    print('v2', v)
+
+
     print('speed_original,' , speed_l, speed_r)
     if speed_r > MAX_SPEED :
         speed_r = MAX_SPEED
@@ -120,6 +126,7 @@ def move_to_position(pos_robot , angle_robot, pos_goal, old_distance, old_angle)
     old_distance = dist_center
     old_angle = alpha
 
+    
     return speed_l, speed_r , old_distance, old_angle
 
 
