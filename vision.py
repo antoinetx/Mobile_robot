@@ -152,10 +152,11 @@ def vision_end(VideoCap):
     
 def mask_map_init(frame):
     
-    bl_points, bl_mask, bl_contours=detect_inrange(frame, 999000, blue)
+    bl_points, bl_mask, bl_contours=detect_inrange(frame, 10000, blue)
+    gr_points, gr_mask, gr_contours=detect_inrange(frame, 10000, green)
     
     
-    return bl_mask
+    return bl_mask, gr_mask
     
 
 
