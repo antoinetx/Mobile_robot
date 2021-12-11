@@ -48,7 +48,7 @@ class Map :
         
     
     
-    def security_grid_expand(self, frame, robot_len = 0.05, security_margin = 0.025):
+    def security_grid_expand(self, frame, robot_len = 0.05, security_margin = 0.03):
         """
         Expand the grid to avoid the robot colyding whit an obstacle
         :param frame: the video frame 

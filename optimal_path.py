@@ -128,8 +128,8 @@ def A_Star(start, goal, h, coords, occupancy_grid, lenght, movement_type="4N"):
     #        assert coord>=0 and coord< max(lenght), "start or end goal not contained in the map"
     
     # check if start and goal nodes correspond to free spaces
-    #if occupancy_grid[start[0], start[1]]:
-    #   raise Exception('Start node is not traversable')
+    if occupancy_grid[start[0], start[1]]:
+       raise Exception('Start node is not traversable')
 
     if occupancy_grid[goal[0], goal[1]]:
         raise Exception('Goal node is not traversable')
