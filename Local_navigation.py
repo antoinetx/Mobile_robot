@@ -9,28 +9,15 @@ from asgiref.sync import sync_to_async
 import tdmclient
 
 # Global variables and constants
-LED = 32
-SMALL_LED = 2
+WAIT = 30
+I_c = 0.9 #Coefficient about the side horizontal sensors in the "interior"
+E_c = 0.1 #Coefficient about the side horizontal sensors in the "exterior"
+CENT = 100
+HALF = 0.5
 
 left_obstacle = False
 right_obstacle = False
 compt = 0
-WAIT = 30
-
-#LEDS Control
-
-@tdmclient.notebook.sync_var
-def light_em_up(avoid=0,right=0,wait=0):
-    global leds_top, leds_buttons, leds_circle
-    leds_top = [0,LED,LED]
-    if(wait):
-        leds_circle = [SMALL_LED, SMALL_LED, LED, SMALL_LED, SMALL_LED, SMALL_LED, LED, SMALL_LED]
-    else:
-        leds_circle = [0, 0, 0, 0, 0, 0, 0, 0]
-    if(avoid):
-        leds_top = [LED,0,LED]
-    else:
-        leds_top = [0,LED,LED]
 
 ##################
 # MAIN FUNCTIONS
@@ -77,17 +64,17 @@ def avoid_obstacle(Tres_side_high=1200, Tres_side_low=500, Tres_low=1500, Tres =
         right_obstacle = False
     
             
-    speed_l = speed0 + obstSpeedGain * int(0.9*obst[0]//100 + 0.1*obst[3]//100)
-    speed_r = speed0 + obstSpeedGain * int(0.9*obst[1]//100 + 0.1*obst[4]//100)
+    speed_l = speed0 + obstSpeedGain * int(I_c*obst[0]//CENT + E_c*obst[3]//CENT)
+    speed_r = speed0 + obstSpeedGain * int(I_c*obst[1]//CENT + E_c*obst[4]//CENT)
     
     #in order to not have problems when there's just one obstacle right in front of Thymio
     if (abs(obst[0]-obst[1])<Tres):
         if obst[3]>obst[4]:
             speed_r = 0
-            speed_l = speed_l + obstSpeedGain * int(0.5*obst[2]//100 + 0.5*obst[3]//100)
+            speed_l = speed_l + obstSpeedGain * int(HALF*obst[2]//CENT + HALF*obst[3]//CENT)
         else:
             speed_l = 0
-            speed_r = speed_r + obstSpeedGain * int(0.5*obst[2]//100 + 0.5*obst[4]//100)
+            speed_r = speed_r + obstSpeedGain * int(HALF*obst[2]//CENT + HALF*obst[4]//CENT)
 
         
     #in order to have a nice turn even if the side object is far away
@@ -103,8 +90,7 @@ def avoid_obstacle(Tres_side_high=1200, Tres_side_low=500, Tres_low=1500, Tres =
             if (obst[1]<Tres_side_low):
                 speed_l = 0
                 speed_r = 0
-                compt = compt + 1
-                print(compt)
+                compt = compt + 1 
                 #wait until the other car went away
                 if (compt > WAIT):
                     compt = 0
