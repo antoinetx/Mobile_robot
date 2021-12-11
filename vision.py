@@ -160,7 +160,8 @@ def mask_map_init(frame):
 
 
 def setup_robot_pose(red_contours, red_points, size_frame):
-    if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
+    #if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
+    if cv2.contourArea(red_contours[1]) > cv2.contourArea(red_contours[0]):
         #print('if')
         #calcul position
         pose_robot_1.x = red_points[0][0]
