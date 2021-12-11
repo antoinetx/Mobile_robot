@@ -11,14 +11,14 @@ import numpy.linalg as LA
 
 # simulation parameters 
 KP_dist = 2
-KP_alpha = 80
-BASICSPEED = 70
+KP_alpha = 90
+BASICSPEED = 90
 GAIN = 10
 MAX_SPEED = 200
-th_dist = 2
+th_dist = 1
 dt = 0.1
 KD_dist = 0
-KD_alpha = 1
+KD_alpha = 5
 
 #@tdmclient.notebook.sync_var
 def compute_distance(x_goal, y_goal, x, y):
@@ -107,8 +107,9 @@ def move_to_position(pos_robot , angle_robot, pos_goal, old_distance, old_angle)
 
     speed_r = int(BASICSPEED + v + w)
     speed_l = int(BASICSPEED + v - w)
+
     if alpha > np.pi/18 or alpha < -np.pi/18:
-        speed_r = int( w)
+        speed_r = int(w)
         speed_l = int(- w)
     print('v2', v)
 
