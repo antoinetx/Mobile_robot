@@ -63,7 +63,7 @@ def mask_function(image, lo, hi):
     image=cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     image=cv2.blur(image, (5, 5))
     mask=cv2.inRange(image, lo, hi)
-    mask=cv2.erode(mask, None, iterations=2)
+    mask=cv2.erode(mask, None, iterations=4)
     mask=cv2.dilate(mask, None, iterations=2)
     return mask
 
@@ -203,8 +203,24 @@ def update(frame, factor_reduc):
     size_frame = frame.shape[0]
     red_points, red_mask, red_contours = detect_inrange(frame, 400, red)
     
+    if(len(red_points)>1):
+        cnt = sorted(red_contours, key=cv2.contourArea, reverse=True)
+    
+        ((x, y), rayon)=cv2.minEnclosingCircle(cnt[0])
+        red_points[0][0] = x
+        red_points[0][1] = y
+
+        ((x, y), rayon)=cv2.minEnclosingCircle(cnt[1])
+        red_points[1][0] = x
+        red_points[1][1] = y
+        
+        cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, BLEU, 5)
+        cv2.circle(frame, (red_points[1][0], red_points[1][1]), 10, ROUGE, 5)
+        #put_center_circle(frame,red_contours[1], red_points[1], ROUGE)
+        setup_robot_pose(red_contours, red_points, size_frame)
+    
     #display the vector and points
-    put_center_circle(frame,red_contours, red_points, ROUGE)
+    
         
     #get the points of the robot
     if(len(red_points)>1):
@@ -223,9 +239,9 @@ def update(frame, factor_reduc):
         #cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, (0,255,0), 5)
         #KF.update(np.expand_dims(red_points[0],axis=-1))
         
-    if(len(red_points)>1):
+    #if(len(red_points)>1):
         #print('robot detected')
-        setup_robot_pose(red_contours, red_points, size_frame)
+        #setup_robot_pose(red_contours, red_points, size_frame)
             
     
     return  (int(pose_robot_1.x * factor_reduc), int(pose_robot_1.y*factor_reduc)), pose_robot_1.angle
@@ -243,15 +259,16 @@ def display (frame, bool_bl, bool_gr, bool_red, bool_path, path, factor_reduc):
         gr_points, gr_mask, gr_contours = detect_inrange(frame, 1000, green)
         put_center_circle(frame,gr_contours, gr_points, GREEN)
         
-    if bool_red:
-        red_points, red_mask, red_contours = detect_inrange(frame, 50, red)
-        put_center_circle(frame,red_contours, red_points, ROUGE)
-        if(len(red_points)>1):
-            cv2.arrowedLine(frame,
-                    (int(red_points[0][0]), int(red_points[0][1])), (int(red_points[1][0]), int(red_points[1][1])),
-                    color=(0, 255, 0),
-                    thickness=3,
-                    tipLength=0.2)
+    #if bool_red:
+        #red_points, red_mask, red_contours = detect_inrange(frame, 50, red)
+        #put_center_circle(frame,red_contours[0], red_points[0], ROUGE)
+       # put_center_circle(frame,red_contours[1], red_points[1], BLEU)
+       # if(len(red_points)>1):
+           # cv2.arrowedLine(frame,
+           #         (int(red_points[0][0]), int(red_points[0][1])), (int(red_points[1][0]), int(red_points[1][1])),
+           #         color=(0, 255, 0),
+           #         thickness=3,
+           #         tipLength=0.2)
         #print('arrowed')
         
     
