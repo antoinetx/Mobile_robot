@@ -48,7 +48,7 @@ class Map :
         
     
     
-    def security_grid_expand(self, frame, robot_len = 0.05, security_margin = 0.03):
+    def security_grid_expand(self, frame, mask_green, robot_len = 0.05, security_margin = 0.06):
         """
         Expand the grid to avoid the robot colyding whit an obstacle
         :param frame: the video frame 
@@ -68,22 +68,31 @@ class Map :
         for i in range(len_i):
             if sum(frame[i,:] != 0): # this if allow to avoid the second loop if there is no obstacle on this line
                 for j in range(len_j):
-                    if frame[i][j] > 50:
+                    if (frame[i][j] > 50):
                         new_frame[(i-sec_square):(i+1+sec_square),(j-sec_square):(j+1+sec_square)] = 255
+
+        
+    
+        idx = np.where(mask_green == 255)
+        new_frame[idx] = 0
+        
         return new_frame
                             
                         
     
-    def init_grid(self, frame):
+    def init_grid(self, frame, mask_green):
         
         frame =np.flipud(frame)
         frame = np.transpose(frame)
+        mask_green =np.flipud(mask_green)
+        mask_green = np.transpose(mask_green)
         pourcentage = self._pourcentage
         dim_t = self.map_lenght_in_square
 
 
-        secured_frame = self.security_grid_expand(frame)
+        secured_frame = self.security_grid_expand(frame, mask_green)
         #cv2.imshow("secured", secured_frame)
+        print("SECURED")
         cv2.imwrite("secured.jpg", secured_frame)
         
         # resize image
@@ -93,6 +102,7 @@ class Map :
         #print('Resized Dimensions : ',resized_frame.shape)
         
         #cv2.imshow("rezize mask", resized_frame)
+        print("RESIZE")
         cv2.imwrite("rezize.jpg", resized_frame)
         
         """
