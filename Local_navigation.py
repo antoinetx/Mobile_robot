@@ -15,7 +15,7 @@ SMALL_LED = 2
 left_obstacle = False
 right_obstacle = False
 compt = 0
-WAIT = 10000
+WAIT = 30
 
 #LEDS Control
 
@@ -57,7 +57,7 @@ def check_cars(Tres_high=1400, Tres_mid_side_high=1500, Tres_low=1500, Tres_mid_
 @tdmclient.notebook.sync_var
 def avoid_obstacle(Tres_side_high=1200, Tres_side_low=500, Tres_low=1500, Tres = 100, prox_horizonta=0):
     global left_obstacle, right_obstacle, compt
-    speed0 = 100       # nominal speed
+    speed0 = 70       # nominal speed
     obstSpeedGain = 5  # /100 (actual gain: 5/100=0.05)
 
     
@@ -104,6 +104,7 @@ def avoid_obstacle(Tres_side_high=1200, Tres_side_low=500, Tres_low=1500, Tres =
                 speed_l = 0
                 speed_r = 0
                 compt = compt + 1
+                print(compt)
                 #wait until the other car went away
                 if (compt > WAIT):
                     compt = 0
