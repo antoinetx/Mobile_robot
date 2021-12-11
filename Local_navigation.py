@@ -14,6 +14,8 @@ SMALL_LED = 2
 
 left_obstacle = False
 right_obstacle = False
+compt = 0
+WAIT = 10000
 
 #LEDS Control
 
@@ -54,11 +56,10 @@ def check_cars(Tres_high=1400, Tres_mid_side_high=1500, Tres_low=1500, Tres_mid_
 
 @tdmclient.notebook.sync_var
 def avoid_obstacle(Tres_side_high=1200, Tres_side_low=500, Tres_low=1500, Tres = 100, prox_horizonta=0):
-    global left_obstacle, right_obstacle
+    global left_obstacle, right_obstacle, compt
     speed0 = 100       # nominal speed
     obstSpeedGain = 5  # /100 (actual gain: 5/100=0.05)
-    
-    #play_music()
+
     
     # acquisition from the proximity sensors to detect obstacles
     obst = [prox_horizonta[0], prox_horizonta[4], prox_horizonta[2],prox_horizonta[1], prox_horizonta[3]]
@@ -88,13 +89,6 @@ def avoid_obstacle(Tres_side_high=1200, Tres_side_low=500, Tres_low=1500, Tres =
             speed_l = 0
             speed_r = speed_r + obstSpeedGain * int(0.5*obst[2]//100 + 0.5*obst[4]//100)
 
-    
-    #if both sides are bloqued --> wait
-    if((right_obstacle)and(left_obstacle)):
-        light_em_up(wait=1)
-    #otherwise avoid the object:    
-    else:
-        light_em_up(wait=0)
         
     #in order to have a nice turn even if the side object is far away
     if right_obstacle:
@@ -107,15 +101,18 @@ def avoid_obstacle(Tres_side_high=1200, Tres_side_low=500, Tres_low=1500, Tres =
     if(obst[2]<Tres_low):
         if (obst[0]<Tres_side_low):
             if (obst[1]<Tres_side_low):
-                light_em_up(avoid=0)
-                return speed_l, speed_r, False
+                speed_l = 0
+                speed_r = 0
+                compt = compt + 1
+                #wait until the other car went away
+                if (compt > WAIT):
+                    compt = 0
+                    return speed_l, speed_r, False
+                else:
+                    return speed_l, speed_r, True
     else:
         if (speed_l > speed_r + Tres):
             speed_r = 0
         elif(speed_r > speed_l + Tres):
             speed_l = 0
-
-    print(speed_l, speed_r)
-    light_em_up(avoid=1)
-    
     return speed_l, speed_r, True
