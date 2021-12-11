@@ -92,7 +92,7 @@ class Map :
 
         secured_frame = self.security_grid_expand(frame, mask_green)
         #cv2.imshow("secured", secured_frame)
-        print("SECURED")
+        #print("SECURED")
         cv2.imwrite("secured.jpg", secured_frame)
         
         # resize image
@@ -102,7 +102,7 @@ class Map :
         #print('Resized Dimensions : ',resized_frame.shape)
         
         #cv2.imshow("rezize mask", resized_frame)
-        print("RESIZE")
+        #print("RESIZE")
         cv2.imwrite("rezize.jpg", resized_frame)
         
         """
