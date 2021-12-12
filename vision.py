@@ -13,9 +13,9 @@ from matplotlib.colors import ListedColormap
 
 np.set_printoptions(threshold=sys.maxsize)
 
-blue = 120
+blue = 110
 green = 60
-red = 160 # ou 10
+red = 150 # ou 10
 ROUGE = (0, 0, 255)
 GREEN = (0, 255, 0)
 BLEU = (255, 0, 0)
@@ -63,13 +63,13 @@ def mask_function(image, lo, hi):
     image=cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     image=cv2.blur(image, (5, 5))
     mask=cv2.inRange(image, lo, hi)
-    mask=cv2.erode(mask, None, iterations=4)
-    mask=cv2.dilate(mask, None, iterations=2)
+    mask=cv2.erode(mask, None, iterations=8)
+    mask=cv2.dilate(mask, None, iterations=6)
     return mask
 
 def detect_inrange(image, surface, color):
     points=[]
-    lo=np.array([color - sensitivity, 50, 50])
+    lo=np.array([color - sensitivity, 60, 60])
     hi=np.array([color + sensitivity, 255, 255])
 
     mask = mask_function(image, lo, hi)
@@ -137,7 +137,7 @@ def init_goal(frame, factor_reduc):
         goal.x = gr_points[0][0]
         goal.y = frame.shape[0] - gr_points[0][1]
     else:
-        print('No parking slot free')
+        assert False, 'No parking slot free'
         
     goal_vect = (int(goal.x*factor_reduc), int(goal.y*factor_reduc))
     
@@ -202,7 +202,7 @@ def setup_robot_pose(red_contours, red_points, size_frame):
 def update(frame, factor_reduc):
             
     size_frame = frame.shape[0]
-    red_points, red_mask, red_contours = detect_inrange(frame, 400, red)
+    red_points, red_mask, red_contours = detect_inrange(frame, 200, red)
     
     if(len(red_points)>1):
         cnt = sorted(red_contours, key=cv2.contourArea, reverse=True)
