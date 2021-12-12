@@ -200,6 +200,7 @@ def setup_robot_pose(red_contours, red_points, size_frame):
     #print(angle)
     
 def update(frame, factor_reduc):
+    bool_measure = True
             
     size_frame = frame.shape[0]
     red_points, red_mask, red_contours = detect_inrange(frame, 200, red)
@@ -208,6 +209,7 @@ def update(frame, factor_reduc):
     #cv2.imshow("mask rouge",red_mask)
     
     if(len(red_points)>1):
+        bool_measure = True
         cnt = sorted(red_contours, key=cv2.contourArea, reverse=True)
     
         ((x, y), rayon)=cv2.minEnclosingCircle(cnt[0])
@@ -220,12 +222,10 @@ def update(frame, factor_reduc):
         
         cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, BLEU, 5)
         cv2.circle(frame, (red_points[1][0], red_points[1][1]), 10, ROUGE, 5)
-        #put_center_circle(frame,red_contours[1], red_points[1], ROUGE)
         setup_robot_pose(red_contours, red_points, size_frame)
     
-    #display the vector and points
-    
-        
+  
+           
     #get the points of the robot
     if(len(red_points)>1):
         cv2.arrowedLine(frame,
@@ -233,22 +233,9 @@ def update(frame, factor_reduc):
                     color=(0, 255, 0),
                     thickness=3,
                     tipLength=0.2)
-        #print('arrowed')
-      
-      
-    #etat=KF.predict().astype(np.int32)
+
     
-    # calculate the position
-    #if(len(red_points)>0):
-        #cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, (0,255,0), 5)
-        #KF.update(np.expand_dims(red_points[0],axis=-1))
-        
-    #if(len(red_points)>1):
-        #print('robot detected')
-        #setup_robot_pose(red_contours, red_points, size_frame)
-            
-    
-    return  (int(pose_robot_1.x * factor_reduc), int(pose_robot_1.y*factor_reduc)), pose_robot_1.angle
+    return  (int(pose_robot_1.x * factor_reduc), int(pose_robot_1.y*factor_reduc)), pose_robot_1.angle, bool_measure
     
     
     

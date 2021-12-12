@@ -38,16 +38,16 @@ class KalmanFilter(object):
         self.P=np.eye(self.A.shape[1])
 
     def predict(self):
-        print('les matrices prediction E sont ', self.E)
+        #print('les matrices prediction E sont ', self.E)
         self.E=np.dot(self.A, self.E)
-        print(' la matrice E est', self.E)
+       # print(' la matrice E est', self.E)
         # Calcul de la covariance de l'erreur
         self.P=np.dot(np.dot(self.A, self.P), self.A.T)+self.Q
        # print('la taille de P est', self.P.shape)
         return self.E
 
     def update(self, z):
-        print('la valeur  b est',b)
+       # print('la valeur  b est',b)
         # Calcul du gain de Kalman
         #print('le vecteur z est', z)
         #print('la taille de z est', z.shape)
@@ -55,7 +55,7 @@ class KalmanFilter(object):
         K=np.dot(np.dot(self.P, self.H.T), np.linalg.inv(S))
        # print('la taille de S est', S.shape)
        # print('la taille de K est', K.shape)
-        print('update 1 E', self.E)
+       # print('update 1 E', self.E)
         # Correction / innovation
         self.E=np.round(self.E+np.dot(K, (z-np.dot(self.H, self.E))))
        # print('la taille de E est', self.E.shape)
