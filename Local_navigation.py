@@ -9,19 +9,21 @@ from asgiref.sync import sync_to_async
 import tdmclient
 
 # Global variables and constants
-WAIT = 100
+WAIT = 50
 I_c = 0.9 #Coefficient about the side horizontal sensors in the "interior"
 E_c = 0.1 #Coefficient about the side horizontal sensors in the "exterior"
 CENT = 100
 HALF = 0.5
+KEEP_GOING = 60
 
 left_obstacle = False
 right_obstacle = False
-compt = 0
-
+compt = WAIT
+conti = KEEP_GOING
 ##################
 # MAIN FUNCTIONS
 ##################
+
         
 # ### Check cars
 # This function will check if there's something in front of Thymio. If there's, it will return **TRUE** and take the control of the Thymio. If there's nothing, it will return **FALSE** and let the control to optimal path
@@ -42,8 +44,8 @@ def check_cars(Tres_high=1400, Tres_mid_side_high=1500, Tres_low=1500, Tres_mid_
 # **We call this function when check_cars() = True otherwise we call the logical path**
 
 @tdmclient.notebook.sync_var
-def avoid_obstacle(Tres_side_high=1200, Tres_side_low=500, Tres_low=1500, Tres = 100, prox_horizonta=0):
-    global left_obstacle, right_obstacle, compt
+def avoid_obstacle( Tres_side_high=1200, Tres_side_low=1000, Tres_low=1500, Tres = 100, prox_horizonta=0):
+    global left_obstacle, right_obstacle, compt, conti
     speed0 = 70       # nominal speed
     obstSpeedGain = 5  # /100 (actual gain: 5/100=0.05)
 
@@ -86,17 +88,29 @@ def avoid_obstacle(Tres_side_high=1200, Tres_side_low=500, Tres_low=1500, Tres =
     
     #If Thymio avoided the obstacle 
     if(obst[2]<Tres_low):
-        if (obst[0]<Tres_side_low):
-            if (obst[1]<Tres_side_low):
-                speed_l = 0
-                speed_r = 0
-                compt = compt + 1 
+        print('dans la boucle 1')
+        if (obst[3]<Tres_side_low):
+            print('dans la boucle 2')
+            if (obst[4]<Tres_side_low):
+                print('dans la boucle 3')
                 #wait until the other car went away
-                if (compt > WAIT):
-                    compt = 0
-                    return speed_l, speed_r, False
-                else:
+                if conti >0 :
+                    conti = conti - 1
+                    speed_l = speed0
+                    speed_r = speed0
                     return speed_l, speed_r, True
+                
+                if (compt > 0):
+                    compt = compt - 1 
+                    speed_l = 0
+                    speed_r = 0
+                    print('compteur' , compt)
+                    return speed_l, speed_r, True
+
+                compt = WAIT
+                conti = KEEP_GOING
+                return speed_l, speed_r, False
+                                  
     else:
         if (speed_l > speed_r + Tres):
             speed_r = 0
