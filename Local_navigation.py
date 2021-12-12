@@ -19,7 +19,7 @@ INIT = 0
 
 # Variables to detect the obstacles and avoid them
 
-PROX_FRONT = 3000
+PROX_FRONT = 2700
 PROX_COTE1 = 2700
 PROX_COTE_BORD = 2000
 
@@ -54,7 +54,7 @@ def check_cars(Tres_high=PROX_FRONT, Tres_mid_side_high=PROX_COTE1, Tres_side_hi
 # **We call this function when check_cars() = True otherwise we call the logical path**
 
 @tdmclient.notebook.sync_var
-def avoid_obstacle( Tres_side_high=1200, Tres_side_low=1000, Tres_low=1500, Tres = 100, prox_horizonta=0):
+def avoid_obstacle( Tres_side_high=1200, Tres_side_low=1000, Tres_low=1500, Tres = 500, prox_horizonta=0):
     global left_obstacle, right_obstacle, compt, conti
     speed0 = 70       # nominal speed
     obstSpeedGain = 5  # /100 (actual gain: 5/100=0.05)
@@ -91,17 +91,13 @@ def avoid_obstacle( Tres_side_high=1200, Tres_side_low=1000, Tres_low=1500, Tres
         
     #in order to have a nice turn even if the side object is far away
     if right_obstacle:
-        speed_l = 0
+        speed_l = -speed_r
     if left_obstacle:
-        speed_r = 0
+        speed_r = -speed_l
     #if Thymio is bloqued -> it turns away
     if(right_obstacle)and(left_obstacle):
-        if (obst[3]>obst[4]):#droite > gauche --> droite plus proche que gauche
-            speed_l = - speed0
-            speed_r = speed0
-        else:
-            speed_l = speed0
-            speed_r = -speed0
+        speed_l = speed0
+        speed_r = -speed0
 
     
     #If Thymio avoided the obstacle 
@@ -131,7 +127,7 @@ def avoid_obstacle( Tres_side_high=1200, Tres_side_low=1000, Tres_low=1500, Tres
                                   
     else:
         if (speed_l > speed_r + Tres):
-            speed_r = 0
+            speed_r = -speed_l
         elif(speed_r > speed_l + Tres):
-            speed_l = 0
+            speed_l = -speed_r
     return speed_l, speed_r, True
