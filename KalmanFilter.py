@@ -65,5 +65,38 @@ class KalmanFilter(object):
         
         print('update 2 E', self.E)
         
-
         return self.E
+        
+    def KalmanFilter(self,bool_measure, speed_l, speed_r, pos_camera):
+        etat = predict().astype(np.float64)
+        
+        position_robot =np.array([0,0])
+        position_robot[0] = etat[0][0]
+        position_robot[1] = etat[1][0]
+        
+        if bool_measure:
+            etat
+            speed = ( speed_l + speed_r)/ 2
+            speed = speed / 45.045
+           # print(' la vitesse moyen est', speed)
+
+            speed_x = speed*np.cos(angle_robot)
+            speed_y = speed*np.sin(angle_robot)
+
+            if (len(pos_camera)>0):
+                array = np.array([ 0,0,0,0.0])
+                array[0] = float(pos_camera[0])
+                array[1] = float(pos_camera[1])
+                array[2] = float(speed_x)
+                array[3] = float(speed_y)
+
+                update(np.expand_dims(array, axis=-1))
+
+        print(' bool detect est',  bool_measure)
+        
+        print(' les points du kF sont', etat)
+        
+        return  position_robot
+        
+
+        
