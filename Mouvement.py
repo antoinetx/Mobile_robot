@@ -1,27 +1,33 @@
 
+# Implementation of **PD Controller**
+# 
+# Author: Nour Tnani, Robotic MA1, Fall 2021
 
 from asgiref.sync import sync_to_async
-import tdmclient
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.linalg as LA
 
 
-# ## Move from point A to point B
-
 # simulation parameters 
-KP_dist = 2
-KP_alpha = 50   #90
-BASICSPEED = 90
-GAIN = 10
-MAX_SPEED = 200
-th_dist = 0.5
-dt = 0.1
-KD_dist = 0
-KD_alpha = 15 #50 
+KP_DIST     =   2
+KP_ALPHA    =   50   
+KD_DIST     =   0                  # We finally just needed a P controller for the distance
+KD_ALPHA    =   15  
+BASICSPEED  =   90
+MAX_SPEED   =   200
+DT          =   0.1
 
-#@tdmclient.notebook.sync_var
+
 def compute_distance(x_goal, y_goal, x, y):
+    """
+    This function computes the distance between the distance
+    :param x_goal       :   x coordinate of the goal 
+    :param y_goal       :   y coordinate of the goal
+    :param x            :   x coordinate of the robot
+    :param y            :   y coordinate of the robot
+    :return             :   distance between the goal and the robot 
+    """
     x_diff = x_goal - x
     y_diff = y_goal - y
     dist = np.hypot(x_diff, y_diff)
@@ -29,32 +35,50 @@ def compute_distance(x_goal, y_goal, x, y):
     return dist
 
 def unit_vector(vector):
+    """
+    This function normalizes a vector 
+    :param vector       :   the vector expressed as an array
+    :return             :   the vector with normalized coordinates
+    """
     return vector / np.linalg.norm(vector)
 
-
 def get_angle (axe_ref, vect_goal):
+    """
+    This function gives the angle between two desired vectors
+    :param axe_ref      :   first vector expressed as an array, vector of reference 
+    :param vect_goal    :   second vector expressed as an array, moving vector
+    :return             :   angle between the vectors, comprised in the range [-pi, pi]         
+    """
     v1_u = unit_vector(axe_ref)
     v2_u = unit_vector(vect_goal)
-    angle = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+    angle = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))           # gives an unsigned angle
+
     if vect_goal[1] < 0:
-        angle = 2*np.pi - angle
+        angle = 2*np.pi - angle                                         # we do these changes to have the negative angle if the y coordinate of the goal is negative.
     return angle
 
-def angle_voulu(angle_goal,angle_robot):
-    angle_voulu = angle_goal - angle_robot
-    print(angle_voulu)
-    #cette condition fait que si l'angle entre le robot et le goal est plus grand que pi (180°)
-    #il change l'angle goal pour que la rotation soit minimum
-    # par exemple si on prends l'axe des x comme 0° si le robot a un angle de 90° et le goal un angle de 315° (270 + 45)
-    # on a forcé dans la fonction au dessu l'angle a etre 315° et non -45° mais ici la rotation que le robot effectuerait 
-    #serait donc de 225°, il vaudrait donc mieu utiliser -45° pour que le robot tourne dans l'autre sens et on prends donc 2pi - angle_goal
-    #ce qui donne bien les -45°. De cette manière l'angle obtenu au final est tjr plus petit que 180°
-    if angle_voulu > np.pi:
+def angle_voulu(angle_goal, angle_robot):
+    """
+    This function gives the optimal difference of angles
+    :param angle_goal   :   angle of the desired goal, as computed in the get_angle function
+    :param angle_robot  :   the actual angle that the robot has
+    :return             :   the desired angle change that has to be done
+    """
+    angle_voulu = angle_goal - angle_robot                         
+    if angle_voulu > np.pi:                                              # if the desired changing angle is more than 180°, the robot will rotate in the other way
         angle_voulu = angle_goal -2*np.pi - angle_robot
     return angle_voulu
     
-def PD (old_value, new_value,Kd,Kp, dt) :
-
+def PD (old_value, new_value, Kd, Kp, dt) :
+    """
+    This function computes the Proportion Derivative controller of a given variable
+    :param old_value    :   value of the variable at time t-1
+    :param new_value    :   value of the variable at time t
+    :param Kd           :   Kd parameter to tune with experiments
+    :param Kp           :   Kp parameter to tune with experiments
+    :param dt           :   time difference between each loop
+    :return             :   the PD coefficient to consider
+    """
     erreur = new_value - old_value
     D = (Kd * erreur) / dt
     P = Kp * new_value
@@ -62,75 +86,50 @@ def PD (old_value, new_value,Kd,Kp, dt) :
     return PD
 
 
-#@tdmclient.notebook.sync_var
 def move_to_position(pos_robot , angle_robot, pos_goal, old_distance, old_angle):
     """
-    dist is the distance between the robot and the goal position
-    alpha is the angle to the goal respectively to the angle of the robot
-    
-    Kp_dist * dist and Kp_alpha * alpha drive the robot along a line towards the goal
-
+    This function will drive the robot along a line towards the goal
+    :param pos_robot        :   array of the robot's coordinates
+    :param angle_robot      :   value of the angle of the robot, given between [-pi,pi]
+    :param pos_goal         :   array of the goal's coordinates
+    :param old_distance     :   value of the last computed distance error, needed for PD implementation
+    :param old_angle        :   value of the last computed angle error, needed for PD implementation
+    :return speed_l         :   speed of the left wheel
+    :return speed_r         :   speed of the right wheel
+    :return old_distance    :   the error in distance that has just been computed
+    :return old_angle       :   the error in angle that has just been computed 
     """
-    #print ("movement")
-    #print (pos_robot)
-    #print('old dist,' , old_distance, 'old angle', old_angle)
-
     x_robot, y_robot = pos_robot[0] , pos_robot[1]
     x_goal , y_goal = pos_goal[0] , pos_goal[1]
-
-
-    #print('debut',x_robot,y_robot,angle_robot)
         
     # distance computation respectively to the center
-    dist_center = compute_distance(x_goal, y_goal, x_robot, y_robot)
-    #print('dist_debut',dist_center)
+    dist_center = compute_distance(x_goal, y_goal, x_robot, y_robot)  
 
-    # computation alpha
+    # computation of angle alpha
     axe_ref = np.array([1,0])
     vect_goal = np.array( [(x_goal - x_robot), (y_goal - y_robot)])
     angle_goal = get_angle(axe_ref, vect_goal)
-    #print('angle_goal,', angle_goal)
-    alpha = angle_voulu(angle_goal, angle_robot)   # erreur d'angle à corriger avec le PD
-    #print('alpha', alpha)
-
+    alpha = angle_voulu(angle_goal, angle_robot)   
 
     # Implementation of PD :
-    v = PD (old_distance, dist_center, KD_dist, KP_dist, dt)
-    #print('v', v)
-
-    w = PD (old_angle, alpha, KD_alpha, KP_alpha, dt)
-    #print('w', w)
-
-    
-    #print('new dist,' , dist_center, 'new angle', alpha)
-
+    v = PD (old_distance, dist_center, KD_DIST, KP_DIST, DT)
+    w = PD (old_angle, alpha, KD_ALPHA, KP_ALPHA, DT)
 
     speed_r = int(BASICSPEED + v + w)
     speed_l = int(BASICSPEED + v - w)
 
-    #if alpha > np.pi/18 or alpha < -np.pi/18:
     if alpha > np.pi/2 or alpha < -np.pi/2:
         speed_r = int(w)
         speed_l = int(- w)
-    #print('v2', v)
 
-
-    #print('speed_original,' , speed_l, speed_r)
     if speed_r > MAX_SPEED :
         speed_r = MAX_SPEED
     if speed_l > MAX_SPEED:
         speed_l = MAX_SPEED
-    #if dist_center <= th_dist:
-    #   speed_l, speed_r = 0,0 
-
-    #print('speed,' , speed_l, speed_r)
 
     old_distance = dist_center
     old_angle = alpha
-
-    
+ 
     return speed_l, speed_r , old_distance, old_angle
 
-
-#move_to_position(4.7 , 23, 1.43, 40,40)
 
