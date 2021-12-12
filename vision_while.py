@@ -15,7 +15,7 @@ np.set_printoptions(threshold=sys.maxsize)
 
 blue = 120
 green = 60
-red = 150 # ou 10
+red = 160 # ou 10
 ROUGE = (0, 0, 255)
 GREEN = (0, 255, 0)
 BLEU = (255, 0, 0)
@@ -28,7 +28,7 @@ blue = 120
 green = 60
 sensitivity = 20
 
-blue_lo=np.array([100, 50, 50])
+blue_lo=np.array([100, 60, 60])
 blue_hi=np.array([140, 255, 255])
 
 green_lo=np.array([40, 50, 50])
@@ -94,13 +94,13 @@ def mask_function(image, lo, hi):
     image=cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     image=cv2.blur(image, (5, 5))
     mask=cv2.inRange(image, lo, hi)
-    mask=cv2.erode(mask, None, iterations=2)
-    mask=cv2.dilate(mask, None, iterations=2)
+    mask=cv2.erode(mask, None, iterations=4)
+    mask=cv2.dilate(mask, None, iterations=4)
     return mask
     
 def detect_inrange(image, surface, color):
     points=[]
-    lo=np.array([color - sensitivity, 50, 50])
+    lo=np.array([color - sensitivity, 60, 60])
     hi=np.array([color + sensitivity, 255, 255])
 
     mask = mask_function(image, lo, hi)
@@ -296,7 +296,7 @@ def update(frame, factor_reduc, kalman_bool):
         stop_video =True  
         
     
-    return  pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc, pose_robot_1.angle, stop_video
+    return  pose_robot_1.x * factor_reduc, pose_robot_1.y*factor_reduc, pose_robot_1.angle
 
 # ---- MAIN ----
 
@@ -310,10 +310,24 @@ while(True):
     
     #gr_points, gr_mask = vision_initialization(frame)
     
-    update(frame, 1, 0)
+    pose_robot_1.x , pose_robot_1.y, pose_robot_1.angle= update(frame, 1, 0)
     
-    #bl_points, bl_mask, bl_contours = detect_inrange(frame, 1000, blue)
-    #gr_points, gr_mask, gr_contours = detect_inrange(frame, 1000, green)
+    bl_points, bl_mask, bl_contours = detect_inrange(frame, 1000, blue)
+    gr_points, gr_mask, gr_contours = detect_inrange(frame, 1000, green)
+    
+    red_points, red_mask, red_contours = detect_inrange(frame, 400, red) 
+    
+    if(len(red_points)>1):
+        cv2.arrowedLine(frame,
+                    (int(red_points[0][0]), int(red_points[0][1])), (int(red_points[1][0]), int(red_points[1][1])),
+                    color=(0, 255, 0),
+                    thickness=3,
+                    tipLength=0.2)
+    
+    cv2.imshow('image bl', bl_mask)
+    cv2.imshow('image gr', gr_mask)
+    cv2.imshow('image red', red_mask)
+   # print('red')
     
     #put_center_circle(frame,bl_contours, bl_points, ROUGE)
     #put_center_circle(frame,gr_contours, gr_points, ROUGE)
@@ -321,23 +335,12 @@ while(True):
     #image, cnts, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     #cnt = sorted(red_contours, key=cv2.contourArea)
     
-   
-    
-    #if (len(gr_points)>0):
-    #    for i in gr_points:
-    #        cv2.circle(frame, (i[0], i[1]), 7, (0, 0, 255), -1)
           
     if cv2.waitKey(1)&0xFF==ord('q'):
         print('le bouton quitter')        
         vision_end(VideoCap)
         break 
 
-#VideoCap=cv2.VideoCapture(0)
 
-#VideoCap = vision_initialization
-
-#VideoCap=cv2.VideoCapture(0)
-
-#while(True):
     
 # https://stackoverflow.com/questions/32669415/opencv-ordering-a-contours-by-area-python       

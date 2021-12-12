@@ -13,7 +13,7 @@ from matplotlib.colors import ListedColormap
 
 np.set_printoptions(threshold=sys.maxsize)
 
-blue = 110
+blue = 120
 green = 60
 red = 160 # ou 10
 ROUGE = (0, 0, 255)
@@ -63,8 +63,8 @@ def mask_function(image, lo, hi):
     image=cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     image=cv2.blur(image, (5, 5))
     mask=cv2.inRange(image, lo, hi)
-    mask=cv2.erode(mask, None, iterations=8)
-    mask=cv2.dilate(mask, None, iterations=6)
+    mask=cv2.erode(mask, None, iterations=2)
+    mask=cv2.dilate(mask, None, iterations=2)
     return mask
 
 def detect_inrange(image, surface, color):
