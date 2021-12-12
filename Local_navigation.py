@@ -9,7 +9,7 @@ from asgiref.sync import sync_to_async
 import tdmclient
 
 # Global variables and constants
-WAIT = 50
+WAIT = 0
 I_c = 0.9 #Coefficient about the side horizontal sensors in the "interior"
 E_c = 0.1 #Coefficient about the side horizontal sensors in the "exterior"
 CENT = 100
@@ -19,8 +19,8 @@ INIT = 0
 
 # Variables to detect the obstacles and avoid them
 
-PROX_FRONT = 2700
-PROX_COTE1 = 2700
+PROX_FRONT = 2000
+PROX_COTE1 = 2400
 PROX_COTE_BORD = 2000
 
 # Varaiables to know that the obstacle is avoided
