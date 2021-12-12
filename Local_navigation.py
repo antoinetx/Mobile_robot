@@ -19,7 +19,7 @@ INIT = 0
 
 # Variables to detect the obstacles and avoid them
 
-PROX_FRONT = 3400
+PROX_FRONT = 3000
 PROX_COTE1 = 2700
 PROX_COTE_BORD = 2000
 
@@ -94,6 +94,14 @@ def avoid_obstacle( Tres_side_high=1200, Tres_side_low=1000, Tres_low=1500, Tres
         speed_l = 0
     if left_obstacle:
         speed_r = 0
+    #if Thymio is bloqued -> it turns away
+    if(right_obstacle)and(left_obstacle):
+        if (obst[3]>obst[4]):#droite > gauche --> droite plus proche que gauche
+            speed_l = - speed0
+            speed_r = speed0
+        else:
+            speed_l = speed0
+            speed_r = -speed0
 
     
     #If Thymio avoided the obstacle 
