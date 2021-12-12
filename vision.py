@@ -38,7 +38,6 @@ class Position:
     x= -1
     y=- 1
 
-
 # variables grobales
 
 robot_orientation = 0
@@ -73,7 +72,7 @@ def update(frame, factor_reduc):
         red_points[1][0] = x
         red_points[1][1] = y
         
-        cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, BLEU, 5)
+        cv2.circle(frame, (red_points[0][0], red_points[0][1]), 10, BLUE, 5)
         cv2.circle(frame, (red_points[1][0], red_points[1][1]), 10, RED, 5)
 
         setup_robot_pose(red_contours, red_points, size_frame)
@@ -129,11 +128,11 @@ def display (frame, bool_bl, bool_gr, bool_path, path, factor_reduc):
         allow to show the path planning """
     
     if bool_bl:
-        bl_points, bl_mask, bl_contours = detect_inrange(frame, THRESHOLD_SURFACE_BLUE, blue)
+        bl_points, bl_mask, bl_contours = detect_inrange(frame, THRESHOLD_SURFACE_BLUE, BLUE_HSV)
         put_center_circle(frame,bl_contours, bl_points, GREEN)
         
     if bool_gr:
-        gr_points, gr_mask, gr_contours = detect_inrange(frame, THRESHOLD_SURFACE_GREEN, green)
+        gr_points, gr_mask, gr_contours = detect_inrange(frame, THRESHOLD_SURFACE_GREEN, GREEN_HSV)
         put_center_circle(frame,gr_contours, gr_points, GREEN)
         
     if bool_path:
@@ -168,14 +167,13 @@ def setup_robot_pose(red_contours, red_points, size_frame):
       
     #vector position
     vector_position = Position
-    vector_positino.x = red_points[1][0] - red_points[0][0]
+    vector_position.x = red_points[1][0] - red_points[0][0]
     vector_position.y = red_points[1][1] - red_points[0][1]
     
     #angle between x axis and the vector position
     angle = angle_of_vectors(vector_position.x,vector_position.y, 1,0)
     robot_orientation = angle
     
-
 
 # ------ display function ------
 
@@ -187,7 +185,6 @@ def put_center_circle(image, contours,points,color):
             cv2.circle(image, (i[0], i[1]), 7, color, -1)
             
 
-            
 # ------ detector functions -------
 
 def mask_function(image, lo, hi):
@@ -243,19 +240,3 @@ def angle_of_vectors(a,b,c,d):
         rad = rad * (-1)
     
     return rad
-
-    
-    
-    
-
-    
-    
-    
-        
-
-
-
-
-     
-
-        
