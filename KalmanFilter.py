@@ -97,6 +97,22 @@ class KalmanFilter(object):
         #print(' les points du kF sont', etat)
         
         return  position_robot
-        
+    
+    def angle_of_vectors_2(a,b,c,d):
+       
+        vec_a = np.array([a, b])
+        vec_b = np.array([c, d])
+
+        inner = np.inner(vec_a, vec_b)
+        norms = LA.norm(vec_a) * LA.norm(vec_b)
+
+        cos = inner / norms
+        rad = np.arccos(np.clip(cos, -1.0, 1.0))
+
+        if b < 0:
+            rad = rad * (-1)
+
+        return rad
+
 
         
