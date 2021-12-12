@@ -39,6 +39,9 @@ class Position:
 
 
 # ---- variable grobale
+#KF=KalmanFilter(0.1, [0, 0])
+
+
 
 pose_robot_1 = Pose
 pose_robot_2 = Pose
@@ -91,6 +94,8 @@ def detect_center(image, contours):
     for i in contours:
         M = cv2.moments(i)
         if M['m00'] != 0:
+            #print('valeur')
+            #print(a)
             a += 1
             cx = int(M['m10']/M['m00'])
             cy = int(M['m01']/M['m00'])
@@ -124,6 +129,9 @@ def init_goal(frame, factor_reduc):
     
     goal_vect = (0, 0)
     gr_points,  gr_mask, gr_contours=detect_inrange(frame, 1000, green)
+    #print(' la position goal')
+    #print(gr_points)
+    
     
     if (len(gr_points)>0):
         goal.x = gr_points[0][0]
@@ -146,9 +154,11 @@ def mask_map_init(frame):
     
     bl_points, bl_mask, bl_contours=detect_inrange(frame, 10000, blue)
     gr_points, gr_mask, gr_contours=detect_inrange(frame, 10000, green)
-       
+    
+    
     return bl_mask, gr_mask
     
+
 
 def setup_robot_pose(red_contours, red_points, size_frame):
     #if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
@@ -186,7 +196,8 @@ def setup_robot_pose(red_contours, red_points, size_frame):
     vector.y = red_points[1][1] - red_points[0][1]
     angle = angle_of_vectors(vector.x,vector.y,1,0)
     pose_robot_1.angle = angle
-  
+    #print('l angle')
+    #print(angle)
     
 def update(frame, factor_reduc):
     bool_mesure = False
@@ -226,11 +237,10 @@ def update(frame, factor_reduc):
         #print('arrowed')
       
       
-            
+            print('robot 1',(int(pose_robot_1.x * factor_reduc), int(pose_robot_1.y*factor_reduc)))
+            print('robot 2',(int(pose_robot_2.x * factor_reduc), int(pose_robot_2.y*factor_reduc)))
     
     return  (int(pose_robot_1.x * factor_reduc), int(pose_robot_1.y*factor_reduc)), (int(pose_robot_2.x * factor_reduc), int(pose_robot_2.y*factor_reduc)), pose_robot_1.angle, bool_mesure
-    
-    
     
     
 def display (frame, bool_bl, bool_gr, bool_red, bool_path, path, factor_reduc):
@@ -243,6 +253,18 @@ def display (frame, bool_bl, bool_gr, bool_red, bool_path, path, factor_reduc):
         gr_points, gr_mask, gr_contours = detect_inrange(frame, 1000, green)
         put_center_circle(frame,gr_contours, gr_points, GREEN)
         
+    #if bool_red:
+        #red_points, red_mask, red_contours = detect_inrange(frame, 50, red)
+        #put_center_circle(frame,red_contours[0], red_points[0], ROUGE)
+       # put_center_circle(frame,red_contours[1], red_points[1], BLEU)
+       # if(len(red_points)>1):
+           # cv2.arrowedLine(frame,
+           #         (int(red_points[0][0]), int(red_points[0][1])), (int(red_points[1][0]), int(red_points[1][1])),
+           #         color=(0, 255, 0),
+           #         thickness=3,
+           #         tipLength=0.2)
+        #print('arrowed')
+        
     
     if bool_path:
         path_ar = np.transpose(path)
@@ -253,6 +275,13 @@ def display (frame, bool_bl, bool_gr, bool_red, bool_path, path, factor_reduc):
     
     cv2.imshow('image', frame)
     
+    
+    
         
+
+
+
+
+     
 
         

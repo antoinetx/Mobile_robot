@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.linalg as LA
 
 b=1
 
@@ -98,8 +99,10 @@ class KalmanFilter(object):
         
         return  position_robot
     
-    def angle_of_vectors_2(a,b,c,d):
+    def angle_of_vectors_2(self,a,b,c,d):
        
+        if((a == 0) and (b == 0)):
+            return 0
         vec_a = np.array([a, b])
         vec_b = np.array([c, d])
 
