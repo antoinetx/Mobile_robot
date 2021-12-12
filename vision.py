@@ -15,7 +15,7 @@ np.set_printoptions(threshold=sys.maxsize)
 
 blue = 110
 green = 60
-red = 150 # ou 10
+red = 160 # ou 10
 ROUGE = (0, 0, 255)
 GREEN = (0, 255, 0)
 BLEU = (255, 0, 0)
@@ -203,6 +203,9 @@ def update(frame, factor_reduc):
             
     size_frame = frame.shape[0]
     red_points, red_mask, red_contours = detect_inrange(frame, 200, red)
+    
+    #print("Hello2")
+    #cv2.imshow("mask rouge",red_mask)
     
     if(len(red_points)>1):
         cnt = sorted(red_contours, key=cv2.contourArea, reverse=True)

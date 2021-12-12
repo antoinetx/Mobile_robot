@@ -11,14 +11,14 @@ import numpy.linalg as LA
 
 # simulation parameters 
 KP_dist = 2
-KP_alpha = 1   #90
+KP_alpha = 50   #90
 BASICSPEED = 90
 GAIN = 10
 MAX_SPEED = 200
-th_dist = 1
+th_dist = 0.5
 dt = 0.1
 KD_dist = 0
-KD_alpha = 0.6 #50 
+KD_alpha = 15 #50 
 
 #@tdmclient.notebook.sync_var
 def compute_distance(x_goal, y_goal, x, y):
@@ -89,17 +89,17 @@ def move_to_position(pos_robot , angle_robot, pos_goal, old_distance, old_angle)
     axe_ref = np.array([1,0])
     vect_goal = np.array( [(x_goal - x_robot), (y_goal - y_robot)])
     angle_goal = get_angle(axe_ref, vect_goal)
-    print('angle_goal,', angle_goal)
+    #print('angle_goal,', angle_goal)
     alpha = angle_voulu(angle_goal, angle_robot)   # erreur d'angle à corriger avec le PD
-    print('alpha', alpha)
+    #print('alpha', alpha)
 
 
     # Implementation of PD :
     v = PD (old_distance, dist_center, KD_dist, KP_dist, dt)
-    print('v', v)
+    #print('v', v)
 
     w = PD (old_angle, alpha, KD_alpha, KP_alpha, dt)
-    print('w', w)
+    #print('w', w)
 
     
     print('new dist,' , dist_center, 'new angle', alpha)
@@ -112,7 +112,7 @@ def move_to_position(pos_robot , angle_robot, pos_goal, old_distance, old_angle)
     if alpha > np.pi/2 or alpha < -np.pi/2:
         speed_r = int(w)
         speed_l = int(- w)
-    print('v2', v)
+    #print('v2', v)
 
 
     print('speed_original,' , speed_l, speed_r)
@@ -120,8 +120,8 @@ def move_to_position(pos_robot , angle_robot, pos_goal, old_distance, old_angle)
         speed_r = MAX_SPEED
     if speed_l > MAX_SPEED:
         speed_l = MAX_SPEED
-    if dist_center <= th_dist:
-        speed_l, speed_r = 0,0 
+    #if dist_center <= th_dist:
+    #   speed_l, speed_r = 0,0 
 
     print('speed,' , speed_l, speed_r)
 
