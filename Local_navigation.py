@@ -15,6 +15,16 @@ E_c = 0.1 #Coefficient about the side horizontal sensors in the "exterior"
 CENT = 100
 HALF = 0.5
 KEEP_GOING = 60
+INIT = 0
+
+# Variables to detect the obstacles and avoid them
+
+PROX_FRONT = 3400
+PROX_COTE1 = 2700
+PROX_COTE_BORD = 2000
+
+# Varaiables to know that the obstacle is avoided
+
 
 left_obstacle = False
 right_obstacle = False
@@ -28,7 +38,7 @@ conti = KEEP_GOING
 # ### Check cars
 # This function will check if there's something in front of Thymio. If there's, it will return **TRUE** and take the control of the Thymio. If there's nothing, it will return **FALSE** and let the control to optimal path
 @tdmclient.notebook.sync_var
-def check_cars(Tres_high=1400, Tres_mid_side_high=1500, Tres_low=1500, Tres_mid_side_low=1000, Tres_side_high=2000, prox_horizonta=0):
+def check_cars(Tres_high=PROX_FRONT, Tres_mid_side_high=PROX_COTE1, Tres_side_high= PROX_COTE_BORD, prox_horizonta=INIT):
 
     if((prox_horizonta[2]>Tres_high)or(prox_horizonta[1]>Tres_mid_side_high)or(prox_horizonta[3]>Tres_mid_side_high)):
         return True        
@@ -72,11 +82,11 @@ def avoid_obstacle( Tres_side_high=1200, Tres_side_low=1000, Tres_low=1500, Tres
     #in order to not have problems when there's just one obstacle right in front of Thymio
     if (abs(obst[0]-obst[1])<Tres):
         if obst[3]>obst[4]:
-            speed_r = 0
             speed_l = speed_l + obstSpeedGain * int(HALF*obst[2]//CENT + HALF*obst[3]//CENT)
+            speed_r = - speed_l
         else:
-            speed_l = 0
             speed_r = speed_r + obstSpeedGain * int(HALF*obst[2]//CENT + HALF*obst[4]//CENT)
+            speed_l = - speed_r
 
         
     #in order to have a nice turn even if the side object is far away
