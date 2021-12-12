@@ -9,7 +9,7 @@ from asgiref.sync import sync_to_async
 import tdmclient
 
 # Global variables and constants
-WAIT = 30
+WAIT = 100
 I_c = 0.9 #Coefficient about the side horizontal sensors in the "interior"
 E_c = 0.1 #Coefficient about the side horizontal sensors in the "exterior"
 CENT = 100
