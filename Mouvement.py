@@ -11,14 +11,14 @@ import numpy.linalg as LA
 
 # simulation parameters 
 KP_dist = 2
-KP_alpha = 20   #90
+KP_alpha = 1   #90
 BASICSPEED = 90
 GAIN = 10
 MAX_SPEED = 200
 th_dist = 1
 dt = 0.1
 KD_dist = 0
-KD_alpha = 50
+KD_alpha = 0.6 #50 
 
 #@tdmclient.notebook.sync_var
 def compute_distance(x_goal, y_goal, x, y):
