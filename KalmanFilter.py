@@ -105,6 +105,7 @@ class KalmanFilter(object):
             return 0
         vec_a = np.array([a, b])
         vec_b = np.array([c, d])
+        
 
         inner = np.inner(vec_a, vec_b)
         norms = LA.norm(vec_a) * LA.norm(vec_b)

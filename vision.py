@@ -45,6 +45,8 @@ class Position:
 
 pose_robot_1 = Pose
 pose_robot_2 = Pose
+point_robot_1 = np.array([-1,-1])
+point_robot_2 = np.array([-1,-1])
 vector = Position
 goal = Position
 
@@ -161,34 +163,33 @@ def mask_map_init(frame):
 
 
 def setup_robot_pose(red_contours, red_points, size_frame):
-    #if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
-    if cv2.contourArea(red_contours[1]) > cv2.contourArea(red_contours[0]):
-        #print('if')
+    if cv2.contourArea(red_contours[0]) > cv2.contourArea(red_contours[1]):
+    #if cv2.contourArea(red_contours[1]) > cv2.contourArea(red_contours[0]):
+       # print('if')
         #calcul position
-        pose_robot_1.x = red_points[0][0]
-        pose_robot_1.y = size_frame - red_points[0][1]
+        
+        point_robot_1[0] = red_points[0][0]
+        point_robot_1[1] = size_frame - red_points[0][1]
         #print('x y du robot')
-        #print(pose_robot_1.x)
+       # print('pose robot_1',pose_robot_1.x)
         #print(pose_robot_1.y)
         
         #calcul vecteur
-        pose_robot_2.x = red_points[1][0]
-        pose_robot_2.y = size_frame -  red_points[1][1]
+        point_robot_2[0] = red_points[1][0]
+        point_robot_2[1] = size_frame - red_points[1][1]
         #print(red_points[1][0])
-        #print(pose_robot_2.x)
+        #print('la pose robot 2',pose_robot_2.x)
     else:
         #print('else')
         #calcul position
-        pose_robot_1.x = red_points[1][0]
-        pose_robot_1.y = size_frame - red_points[1][1]
-        #print(red_points[0][0])
+        point_robot_1[0] = red_points[1][0]
+        point_robot_1[1] = size_frame - red_points[1][1]
         
-        #calcul vecteur
-        pose_robot_2.x = red_points[0][0]
-        pose_robot_2.y = size_frame - red_points[0][1]
-        #print('x y du robot')
-        #print(pose_robot_1.x)
-        #print(pose_robot_1.y)
+        #print(red_points[0][0])
+       # print('pose robot_1 b',point_robot_1)
+        point_robot_2[0] = red_points[0][0]
+        point_robot_2[1] = size_frame - red_points[0][1]    
+      
         
     
     #vecteur 
@@ -196,8 +197,8 @@ def setup_robot_pose(red_contours, red_points, size_frame):
     vector.y = red_points[1][1] - red_points[0][1]
     angle = angle_of_vectors(vector.x,vector.y,1,0)
     pose_robot_1.angle = angle
-    #print('l angle')
-    #print(angle)
+    
+ 
     
 def update(frame, factor_reduc):
     bool_mesure = False
@@ -237,10 +238,10 @@ def update(frame, factor_reduc):
         #print('arrowed')
       
       
-            print('robot 1',(int(pose_robot_1.x * factor_reduc), int(pose_robot_1.y*factor_reduc)))
-            print('robot 2',(int(pose_robot_2.x * factor_reduc), int(pose_robot_2.y*factor_reduc)))
-    
-    return  (int(pose_robot_1.x * factor_reduc), int(pose_robot_1.y*factor_reduc)), (int(pose_robot_2.x * factor_reduc), int(pose_robot_2.y*factor_reduc)), pose_robot_1.angle, bool_mesure
+    #print('robot 1',(int(point_robot_1[0] * factor_reduc), int(point_robot_1[1] * factor_reduc)))
+   # print('robot 2',(int(point_robot_2[0] * factor_reduc), int(point_robot_2[1] * factor_reduc)))
+
+    return  (int(point_robot_1[0] * factor_reduc), int(point_robot_1[1]*factor_reduc)), (int(point_robot_2[0] * factor_reduc), int(point_robot_2[1]*factor_reduc)), pose_robot_1.angle, bool_mesure
     
     
 def display (frame, bool_bl, bool_gr, bool_red, bool_path, path, factor_reduc):
