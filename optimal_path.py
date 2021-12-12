@@ -234,9 +234,9 @@ def path_computation(start , goal , lenght, occupancy_grid):
 
 def path_update(pos, err_pos, path, current):
     # Next Goal Update
-    print("PATH", path)
-    print("X", abs(pos[0] - path[0]))
-    print("Y", abs(pos[1] - path)[1])
+    #print("PATH", path)
+    #print("X", abs(pos[0] - path[0]))
+    #print("Y", abs(pos[1] - path)[1])
     
     if((abs((pos[0] - path[0])) < err_pos) and (abs(pos[1] - path[1]) < err_pos)):
     #if((abs((pos[0] - np.transpose(path)[current][0])) < err_pos) & (abs(pos[1] - np.transpose(path)[current][1]) < err_pos)):

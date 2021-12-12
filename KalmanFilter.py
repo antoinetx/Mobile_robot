@@ -63,19 +63,19 @@ class KalmanFilter(object):
        # print('la taille de I est', I.shape)
         self.P=(I-(K*self.H))*self.P
         
-        print('update 2 E', self.E)
+        #print('update 2 E', self.E)
         
         return self.E
         
-    def KalmanFilter(self,bool_measure, speed_l, speed_r, pos_camera):
-        etat = predict().astype(np.float64)
-        
-        position_robot =np.array([0,0])
+    def kalmanFilter(self,bool_measure, speed_l, speed_r, pos_camera, angle_robot):
+        etat = self.predict().astype(np.float64)
+   
+        position_robot =np.array([0.0,0.0])
         position_robot[0] = etat[0][0]
         position_robot[1] = etat[1][0]
         
         if bool_measure:
-            etat
+            print("MESURE")
             speed = ( speed_l + speed_r)/ 2
             speed = speed / 45.045
            # print(' la vitesse moyen est', speed)
@@ -90,11 +90,11 @@ class KalmanFilter(object):
                 array[2] = float(speed_x)
                 array[3] = float(speed_y)
 
-                update(np.expand_dims(array, axis=-1))
+                self.update(np.expand_dims(array, axis=-1))
 
-        print(' bool detect est',  bool_measure)
+        #print(' bool detect est',  bool_measure)
         
-        print(' les points du kF sont', etat)
+        #print(' les points du kF sont', etat)
         
         return  position_robot
         
