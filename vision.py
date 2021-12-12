@@ -88,6 +88,7 @@ def update(frame, factor_reduc):
 
     return  (int(point_robot_1[0] * factor_reduc), int(point_robot_1[1]*factor_reduc)), (int(point_robot_2[0] * factor_reduc), int(point_robot_2[1]*factor_reduc)), robot_orientation, bool_mesure
 
+
 def mask_map_init(frame):
     """ do the init mask with the color blue and green
     for the initialisation of the map to find the parking
@@ -97,6 +98,7 @@ def mask_map_init(frame):
     gr_points, gr_mask, gr_contours=detect_inrange(frame, 10000, GREEN_HSV)
     
     return bl_mask, gr_mask
+
 
 def vision_end(VideoCap):
     """ close the video cap and the open windows"""
@@ -118,7 +120,6 @@ def init_goal(frame, factor_reduc):
         assert False, 'No parking slot free'
         
     goal_vect = (int(goal.x*factor_reduc), int(goal.y*factor_reduc))
-    
     
     return goal_vect
 
