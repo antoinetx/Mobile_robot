@@ -1,22 +1,28 @@
+# Map class
+# 
+# Author: Antoine Perrin, Robotic MA1, Fall 2021
+
 import numpy as np
 
 
 class Robot :
 
-    test_h = 0
-    test_coords = []
-
     def __init__(self):
-            self.path = np.empty
-            self.visit_node = np.empty
-            self.current_path_index = 0
-            self.start_pos = (-1,-1)
-            self.pos = (-1,-1)
-            self.goal = (0,0)
-            self.angle = 0 # angle with y
-            self.pos_err = 2 # Square error for position
+        """
+        Init the Robot object
+        """
+        self.path = np.empty
+        self.visit_node = np.empty
+        self.current_path_index = 0
+        self.start_pos = (-1,-1)
+        self.pos = (-1,-1)
+        self.goal = (0,0)
+        self.angle = 0 # angle with x
+        self.pos_err = 3 # Square error for position
     
 
+    # Get and set functions:
+    
     def get_pos(self):
         return self.pos
     def set_pos(self, pos):

@@ -1,5 +1,9 @@
+# Map class
+# 
+# Author: Antoine Perrin, Robotic MA1, Fall 2021
+
 #######################################
-# IMPORT AND LIB
+# IMPORT AND LIB:
 #######################################
 
 import math
@@ -13,16 +17,14 @@ from Map import Map
 
 
 #######################################
-# UTILS FUNCTIONS 
+# UTILS FUNCTIONS:
 #######################################
-
-# Display functions
 
 def create_empty_plot(lenght):
     """
     Helper function to create a figure of the desired dimensions & grid
     
-    :param max_val: dimension of the map along the x and y dimensions
+    :param lenght: dimension of the map along the x and y dimensions
     :return: the fig and ax objects.
     """
     fig, ax = plt.subplots(figsize=(7,7))
@@ -44,6 +46,16 @@ def create_empty_plot(lenght):
     return fig, ax
 
 def display_map(lenght , occupancy_grid , visitedNodes ,  path , start, goal):
+    """
+    Display the Map and the optimal path 
+    :param lenght: dimension of the map along the y dimensions
+    :param occupancy_grid: Grid with the obstacles
+    :param visitedNodes: Matrix of visited node for path computation
+    :param path: Optimal path
+    :param start: Start point
+    :param goal: Goal point
+    :desplay: All the parameters
+    """
     cmap = colors.ListedColormap(['white', 'red']) # Select the colors with which to display obstacles and free cells
     # Displaying the map
     #print("LENNNN", lenght)
@@ -56,8 +68,11 @@ def display_map(lenght , occupancy_grid , visitedNodes ,  path , start, goal):
     ax_astar.plot(path[0], path[1], marker="o", color = 'blue');                        #OPTIMAL PATH  0(x) 1(y)
     ax_astar.scatter(start[0], start[1], marker="o", color = 'green', s=200);
     ax_astar.scatter(goal[0], goal[1], marker="o", color = 'purple', s=200);
-  
+    
+
+#######################################
 # A ALGORITHM 
+#######################################
 
 def _get_movements_4n():
     """
@@ -84,6 +99,7 @@ def _get_movements_8n():
             (-1, 1, s2),
             (-1, -1, s2),
             (1, -1, s2)]
+
 
 # RECONSTRUCT PATH
 
@@ -113,23 +129,15 @@ def A_Star(start, goal, h, coords, occupancy_grid, lenght, movement_type="4N"):
     :param movement: select between 4-connectivity ('4N') and 8-connectivity ('8N', default)
     :return: a tuple that contains: (the resulting path in meters, the resulting path in data array indices)
     """
-    
-    # -----------------------------------------
-    # DO NOT EDIT THIS PORTION OF CODE
-    # -----------------------------------------
-    
     # Check if the start and goal are within the boundaries of the map
     
     assert  0 <= start[0] <= lenght[0] and  0 <= start[1] <= lenght[1], "start not contained in the map"
     assert 0 <= goal[0] <= goal[0] and  0 <= goal[1] <= goal[1], "goal not contained in the map"
     
-    #for point in [start, goal]:
-    #    for coord in point:
-    #        assert coord>=0 and coord< max(lenght), "start or end goal not contained in the map"
-    
     # check if start and goal nodes correspond to free spaces
+    
     if occupancy_grid[start[0], start[1]]:
-       raise Exception('Start node is not traversable')
+        raise Exception('Start node is not traversable')
 
     if occupancy_grid[goal[0], goal[1]]:
         raise Exception('Goal node is not traversable')
@@ -142,9 +150,9 @@ def A_Star(start, goal, h, coords, occupancy_grid, lenght, movement_type="4N"):
     else:
         raise ValueError('Unknown movement')
     
-    # --------------------------------------------------------------------------------------------
-    # A* Algorithm implementation - feel free to change the structure / use another pseudo-code
-    # --------------------------------------------------------------------------------------------
+    # -----------------------------
+    # A* Algorithm implementation 
+    # -----------------------------
     
     # The set of visited nodes that need to be (re-)expanded, i.e. for which the neighbors need to be explored
     # Initially, only the start node is known.
@@ -210,10 +218,20 @@ def A_Star(start, goal, h, coords, occupancy_grid, lenght, movement_type="4N"):
     return [], closedSet
 
 
+
 #######################################
 # PATH COMPUTATION AND UPDATE 
 #######################################
+
 def path_computation(start , goal , lenght, occupancy_grid):
+    """
+    Overral function of path computation
+    :param start: start node (x, y)
+    :param goal_m: goal node (x, y)
+    :param occupancy_grid: the grid map
+    :param movement: select between 4-connectivity ('4N') and 8-connectivity ('8N', default)
+    :return: the resulting path, the resulting Visited nodes
+    """
     x,y = np.mgrid[0:lenght[0]:1, 0:lenght[1]:1]
     pos = np.empty(x.shape + (2,))
     pos[:, :, 0] = x; pos[:, :, 1] = y
@@ -233,68 +251,17 @@ def path_computation(start , goal , lenght, occupancy_grid):
 
 
 def path_update(pos, err_pos, path, current):
-    # Next Goal Update
-    #print("PATH", path)
-    #print("X", abs(pos[0] - path[0]))
-    #print("Y", abs(pos[1] - path)[1])
-    
+    """
+    Update the next goal in the path
+    :param pos: The position (x, y)
+    :param path: the path in a vector
+    :param current: Index of the current path node
+    :return: the new current
+    """    
     if((abs((pos[0] - path[0])) < err_pos) and (abs(pos[1] - path[1]) < err_pos)):
-    #if((abs((pos[0] - np.transpose(path)[current][0])) < err_pos) & (abs(pos[1] - np.transpose(path)[current][1]) < err_pos)):
-    #if ((pos - path(current)) < (err_pos,err_pos)):
         print("next goal plz")
         return current+1
     else:
         return current
-
-
-
-#######################################
-# INITIALISATIONS JUSTE POUR TESTS
-#######################################
-
-"""
-robot_start = (0,0) 
-robot_goal = (43,33) 
-
-Paris = Map(5, 50)
-george = Robot(robot_start,robot_goal)
-"""
-
-# Decoment for a map different than 0 -----------------
-"""     
-fig, ax = create_empty_plot(Paris.get_lenght())
-max_val = 50 # Size of the map
-
-# Creating the occupancy grid
-np.random.seed(0) # To guarantee the same outcome on all computers
-data = np.random.rand(Paris.get_lenght(), Paris.get_lenght()) * 20 # Create a grid of 50 x 50 random values
-cmap = colors.ListedColormap(['white', 'red']) # Select the colors with which to display obstacles and free cells
-# Converting the random values into occupied and free cells
-limit = 12 
-occupancy_grid = data.copy()
-occupancy_grid[data>limit] = 1
-occupancy_grid[data<=limit] = 0
-
-Paris.update_map(occupancy_grid)
-"""
-#---------------------------
-
-"""
-#######################################
-# MAIN FOR EST 
-#######################################
-
-
-path, visitedNodes = path_computation(george.get_start() , george.get_goal() , Paris.get_lenght(), Paris.get_map())
-
-george.set_path(path) 
-george.set_visit_nodes(visitedNodes) 
-
-display_map(Paris.get_lenght(),  Paris.get_map(),  george.get_visit_nodes(), george.get_path(), george.get_start(), george.get_goal())
-
-
-plt.show()
-
-"""
 
 
