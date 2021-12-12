@@ -39,9 +39,9 @@ def check_cars(Tres_high=PROX_FRONT, Tres_mid_side_high=PROX_COTE1, prox_horizon
     This function will check if there's something in front of Thymio. If there's, it will return **TRUE** and take the control of the Thymio.
      If there's nothing, it will return **FALSE** and let the control to optimal path
     
-    Tres_high: Threshold that will define if there's an obstacle in front of Thymio
-    Tres_mid_side_high: Threshold that will define if there's an obstacle to the left/right
-    prox_horizonta: sensors values
+    param Tres_high: Threshold that will define if there's an obstacle in front of Thymio
+    param Tres_mid_side_high: Threshold that will define if there's an obstacle to the left/right
+    param prox_horizonta: sensors values
     """
     if((prox_horizonta[2]>Tres_high)or(prox_horizonta[1]>Tres_mid_side_high)or(prox_horizonta[3]>Tres_mid_side_high)):
         return True        
@@ -57,11 +57,11 @@ def avoid_obstacle(Tres_side_high=PROX_COTE_BORD, Tres_side_low=PROX_COTE1_LOW, 
     This function will check to the left/right if there's a "Thymio-car" so our Thymio can avoid the car in front of it. 
     If there's a "Thymio-car" in front of it and on its left/right, our Thymio will wait until the way to the left/right is free again.
     
-    Tres_side_high: Threshold that will define if there's an obstacle to the left/right
-    Tres_side_low: Threshold that will define if there's no more obstacle to the left/right
-    Tres_low: Threshold that will define if there's no more obstacle in front of Thymio
-    Tres: error accepted between the two sides sensors to say that there's no difference between them
-    prox_horizonta: sensors values
+    param Tres_side_high: Threshold that will define if there's an obstacle to the left/right
+    param Tres_side_low: Threshold that will define if there's no more obstacle to the left/right
+    param Tres_low: Threshold that will define if there's no more obstacle in front of Thymio
+    param Tres: error accepted between the two sides sensors to say that there's no difference between them
+    param prox_horizonta: sensors values
     
     global left_obstacle: indicate that there's an obstacle to the left
     global right_obstacle: indicate that there's an obstacle to the right
