@@ -22,8 +22,8 @@ class Map :
         else:
             print("No grid yet. Please init the grid")
 
-    def update_map(self, new_grid):
-        self._grid = new_grid
+    #def update_map(self, new_grid):
+    #    self.grid = new_grid
 
     def get_lenght(self):
         return self._nb_square_by_side
@@ -64,7 +64,7 @@ class Map :
                     data_j[i,math.ceil((j+1)/square_pixe_size)-1] = j_pixel_state
         
             
-        #print(data_j)
+        print(data_j)
 
         #print(len(data_j[1]))
         print("half done")
